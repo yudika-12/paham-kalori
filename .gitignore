@@ -1,1 +1,9 @@
 .vercel
+node_modules
+.next
+next-env.d.ts
+.deployment
+*.env.local
+.env
+.env.*
+!.env.example

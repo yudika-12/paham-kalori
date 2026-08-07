@@ -14,6 +14,7 @@ const API_PATHS = [
 ];
 
 const nextConfig: NextConfig = {
+  output: "standalone",
   transpilePackages: ["@pk/core"],
   async rewrites() {
     return API_PATHS.map((source) => ({
