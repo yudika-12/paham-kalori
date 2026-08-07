@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
-# Dev runner: siapkan DB, jalankan server, dan buka browser otomatis.
+# Dev runner: jalankan backend & frontend untuk pengembangan lokal.
+# Database memakai Neon (via .env / .env.local), bukan PostgreSQL lokal.
 set -e
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$ROOT"
 
-bash backend/scripts/pg.sh ensure
-npm run db:push
-
-# Buka browser saat frontend :3000 sudah siap (background, tanpa kunci proses lain).
+# Buka browser saat frontend :3000 sudah siap (background).
 node backend/scripts/open-browser.js &
 OPEN_PID=$!
 
-# Jalankan server di foreground; kebwa browser tidak menggugurkan server karena -k.
+# Jalankan server di foreground; -k agar browser tidak menggagalkan server.
 concurrently -k -n api,web -c yellow,cyan \
   "npm run dev -w backend" \
   "npm run dev -w frontend"

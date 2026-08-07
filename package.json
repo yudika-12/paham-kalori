@@ -11,8 +11,6 @@
     "dev": "bash backend/scripts/dev.sh",
     "build": "npm run build -w frontend",
     "lint": "npm run lint -w frontend && npm run lint -w backend",
-    "db:start": "bash backend/scripts/pg.sh ensure",
-    "db:stop": "bash backend/scripts/pg.sh stop",
     "db:push": "npm run db:push -w backend"
   },
   "devDependencies": {
