@@ -1,0 +1,34 @@
+{
+  "services": {
+    "frontend": {
+      "root": "frontend",
+      "framework": "nextjs",
+      "installCommand": "npm install --ignore-scripts"
+    },
+    "backend": {
+      "root": "backend",
+      "entrypoint": "server.ts",
+      "buildCommand": "npm run generate",
+      "installCommand": "npm install --ignore-scripts"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/auth/login/(.*)", "destination": { "service": "backend" } },
+    { "source": "/api/auth/login", "destination": { "service": "backend" } },
+    { "source": "/api/auth/check-email/(.*)", "destination": { "service": "backend" } },
+    { "source": "/api/auth/check-email", "destination": { "service": "backend" } },
+    { "source": "/api/register/(.*)", "destination": { "service": "backend" } },
+    { "source": "/api/register", "destination": { "service": "backend" } },
+    { "source": "/api/onboarding/(.*)", "destination": { "service": "backend" } },
+    { "source": "/api/onboarding", "destination": { "service": "backend" } },
+    { "source": "/api/food/(.*)", "destination": { "service": "backend" } },
+    { "source": "/api/food", "destination": { "service": "backend" } },
+    { "source": "/api/metrics/(.*)", "destination": { "service": "backend" } },
+    { "source": "/api/metrics", "destination": { "service": "backend" } },
+    { "source": "/api/chat/(.*)", "destination": { "service": "backend" } },
+    { "source": "/api/chat", "destination": { "service": "backend" } },
+    { "source": "/api/nutrition/(.*)", "destination": { "service": "backend" } },
+    { "source": "/api/nutrition", "destination": { "service": "backend" } },
+    { "source": "/(.*)", "destination": { "service": "frontend" } }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "name": "paham-kalori",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "shared"
+  ],
+  "scripts": {
+    "dev": "bash backend/scripts/dev.sh",
+    "build": "npm run build -w frontend",
+    "lint": "npm run lint -w frontend && npm run lint -w backend",
+    "db:start": "bash backend/scripts/pg.sh ensure",
+    "db:stop": "bash backend/scripts/pg.sh stop",
+    "db:push": "npm run db:push -w backend",
+    "postinstall": "npm run generate -w backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

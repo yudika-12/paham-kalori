@@ -1,0 +1,228 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: var(--font-sans);
+}
+
+body {
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+:root {
+  --bg-warning: #fef3c7;
+  --bg-warning-strong: #b45309;
+  --bg-danger: #fee2e2;
+  --bg-danger-strong: #dc2626;
+  --surface-1: #f8fafc;
+}
+
+.dark {
+  --bg-warning: rgba(245, 158, 11, 0.16);
+  --bg-warning-strong: #fbbf24;
+  --bg-danger: rgba(239, 68, 68, 0.16);
+  --bg-danger-strong: #f87171;
+  --surface-1: rgba(255, 255, 255, 0.04);
+}
+
+@keyframes notifIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.anim-notif-in {
+  animation: notifIn 0.25s ease-out;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes scanline {
+  0%,
+  100% {
+    top: 2%;
+    opacity: 0.8;
+  }
+  50% {
+    top: 92%;
+    opacity: 1;
+  }
+}
+
+@keyframes cornerBlink {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.anim-corner {
+  animation: cornerBlink 2.2s ease-in-out infinite;
+}
+
+@keyframes scanProgress {
+  0% {
+    transform: scaleX(0);
+  }
+  15% {
+    transform: scaleX(0.12);
+  }
+  50% {
+    transform: scaleX(0.55);
+  }
+  85% {
+    transform: scaleX(0.85);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+.anim-progress-scan {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: scanProgress 3.5s ease-in-out infinite;
+}
+
+@keyframes markerPulse {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.65);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.anim-marker {
+  animation: markerPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes scanGrid {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 16px;
+  }
+}
+
+.anim-scan-grid {
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(52, 211, 153, 0.12) 0 2px,
+    transparent 2px 8px
+  );
+  background-size: 100% 16px;
+  animation: scanGrid 1.4s linear infinite;
+}
+
+@keyframes pingRing {
+  0% {
+    transform: scale(0.25);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(2.6);
+    opacity: 0;
+  }
+}
+
+.anim-ping {
+  animation: pingRing 1.3s ease-out infinite;
+}
+
+@keyframes blink {
+  0%,
+  92%,
+  100% {
+    transform: scaleY(1);
+  }
+  96% {
+    transform: scaleY(0.1);
+  }
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  15% {
+    transform: rotate(-16deg);
+  }
+  30% {
+    transform: rotate(8deg);
+  }
+  45% {
+    transform: rotate(-8deg);
+  }
+  60% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes bobble {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes progress-fill {
+  0% {
+    transform: scaleX(0.25);
+  }
+  50% {
+    transform: scaleX(1);
+  }
+  100% {
+    transform: scaleX(0.55);
+  }
+}
+
+.anim-blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink 4.5s infinite;
+}
+
+.anim-wave {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: wave 2.6s ease-in-out infinite;
+}
+
+.anim-bobble {
+  animation: bobble 5s ease-in-out infinite;
+}
+
+.anim-progress {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: progress-fill 3s ease-in-out infinite;
+}

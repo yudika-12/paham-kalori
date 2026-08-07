@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: paham-kalori-api
+    runtime: node
+    rootDir: backend
+    plan: free
+    buildCommand: npm install && npx prisma generate
+    startCommand: npm run start
+    healthCheckPath: /health
+    envVars:
+      - key: AUTH_TRUST_HOST
+        value: "true"
+      - key: GEMINI_MODEL
+        value: "gemini-flash-latest"
+      - key: PORT
+        value: "4000"
+      - key: DATABASE_URL
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: AUTH_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
