@@ -9,7 +9,7 @@ import { invalidateApiCache } from "@/lib/client/api-cache";
 import { imageCompressor } from "@/lib/image";
 import { useRequireAuth } from "@/lib/client/use-require-auth";
 import { FoodAnalysis, mealTypeForHour } from "@pk/core";
-import { nutritionGrade, MACRO_TARGETS } from "@/lib/nutrition-stats";
+import { nutritionGrade } from "@/lib/nutrition-stats";
 
 interface SavedEntry {
   id: string;
@@ -25,25 +25,6 @@ const GRADE_LABEL: Record<string, string> = {
   D: "Kurang Baik",
   E: "Perlu Diwaspadai",
 };
-
-function recommendations(analysis: FoodAnalysis): string[] {
-  const list: string[] = [];
-  const protein = analysis.protein ?? 0;
-  const fat = analysis.fat ?? 0;
-  const carbs = analysis.carbs ?? 0;
-  if (protein < MACRO_TARGETS.protein * 0.2) {
-    list.push("Tambahkan protein (telur/ayam/tahu).");
-  } else {
-    list.push("Protein cukup.");
-  }
-  if (fat > MACRO_TARGETS.fat * 0.15) {
-    list.push("Lemak agak tinggi, pilih panggang/rebus.");
-  }
-  if (carbs > MACRO_TARGETS.carbs * 0.2) {
-    list.push("Imbangi karbohidrat dengan sayur & protein.");
-  }
-  return list.slice(0, 2);
-}
 
 export default function ScanPage() {
   useRequireAuth();
@@ -580,7 +561,6 @@ function ResultView({
     sugar: result.sugar ?? 0,
     sodium: result.sodium ?? 0,
   });
-  const recs = recommendations(result);
   const gradeColor =
     grade.grade === "A" ? "#2E7D32" : grade.grade === "B" ? "#ca8a04" : grade.grade === "C" ? "#ea580c" : "#dc2626";
   const gradeBg =
@@ -667,28 +647,6 @@ function ResultView({
             </div>
           ) : null}
 
-          {recs.length > 0 && (
-            <div className="mt-3 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-3.5">
-              <div className="flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-100">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
-                    <path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.3.3.5.8.5 1.2V15h7v-.3c0-.4.2-.9.5-1.2A6 6 0 0 0 12 3Z" />
-                  </svg>
-                </span>
-                <h3 className="text-[13px] font-bold text-slate-900">Rekomendasi</h3>
-              </div>
-              <ul className="mt-2.5 space-y-1.5">
-                {recs.map((r) => (
-                  <li key={r} className="flex items-start gap-2 text-[13px] leading-snug text-slate-700">
-                    <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[10px] font-bold text-emerald-700">
-                      ✓
-                    </span>
-                    {r}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       </div>
 
