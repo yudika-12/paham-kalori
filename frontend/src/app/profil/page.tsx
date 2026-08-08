@@ -109,13 +109,13 @@ export default function ProfilPage() {
           </div>
         ) : (
           <div className="mt-5 space-y-6">
-            <div className="flex items-center gap-4 rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
-              <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-[#2E7D32] text-2xl font-extrabold text-white">
+            <div className="flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-white p-4 shadow-sm">
+              <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-[#2E7D32] text-xl font-extrabold text-white">
                 {displayName[0].toUpperCase()}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[17px] font-extrabold text-slate-900">{displayName}</p>
-                <p className="truncate text-xs text-slate-400">{session?.user?.email}</p>
+                <p className="truncate text-[15px] font-extrabold text-slate-900">{displayName}</p>
+                <p className="truncate text-[11px] text-slate-400">{session?.user?.email}</p>
 {profile?.goal ? (
                 <span className="mt-1 inline-block rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700">
                   🎯 {GOAL_LABEL[profile.goal] ?? profile.goal}
@@ -134,7 +134,7 @@ export default function ProfilPage() {
               <>
                 <section>
                   <SectionTitle title="Data Tubuh" />
-                  <div className="mt-3 overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-sm">
+                  <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-sm">
                   <ListRow
                     icon={
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
@@ -223,7 +223,7 @@ export default function ProfilPage() {
 
                 <section>
                   <SectionTitle title="Target Harian" />
-                  <div className="mt-3 overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-sm">
+                  <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-sm">
                     <ListRow
                       icon={
                         <span className="flex h-9 w-9 items-center justify-center rounded-full bg-orange-100">
@@ -242,7 +242,7 @@ export default function ProfilPage() {
 
                 <button
                   onClick={() => signOut({ callbackUrl: "/" })}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-100 bg-red-50 py-3.5 text-sm font-bold text-red-600 transition hover:bg-red-100"
+                  className="flex w-full items-center justify-center gap-2 rounded-2xl border border-red-100 bg-red-50 py-3 text-sm font-bold text-red-600 transition hover:bg-red-100"
                 >
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
                     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -304,7 +304,7 @@ function ListRow({
       ) : null}
     </>
   );
-  const cls = `flex w-full items-center gap-3 bg-white px-4 py-3.5 text-left transition ${divide ? "border-t border-slate-100" : ""} ${danger ? "hover:bg-red-50/50" : onClick ? "hover:bg-slate-50" : ""}`;
+  const cls = `flex w-full items-center gap-3 bg-white px-4 py-3 text-left transition ${divide ? "border-t border-slate-100" : ""} ${danger ? "hover:bg-red-50/50" : onClick ? "hover:bg-slate-50" : ""}`;
   return onClick ? (
     <button type="button" onClick={onClick} className={cls}>
       {inner}

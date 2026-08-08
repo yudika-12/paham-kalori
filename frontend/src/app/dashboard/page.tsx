@@ -217,7 +217,7 @@ export default function DashboardPage() {
             onClick={() => setMacroOpen((o) => !o)}
             className="flex w-full items-center justify-between text-left"
           >
-            <h2 className="text-[15px] font-bold text-slate-900">Makronutrien</h2>
+            <h2 className="text-[14px] font-bold text-slate-900">Makronutrien</h2>
             <span className="flex items-center gap-1 text-[12px] font-bold text-[#2E7D32]">
               Lihat Detail
               <svg
@@ -269,7 +269,7 @@ export default function DashboardPage() {
 
         <section className="mt-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-[15px] font-bold text-slate-900">Makanan Hari Ini</h2>
+            <h2 className="text-[14px] font-bold text-slate-900">Makanan Hari Ini</h2>
             <Link href="/history" className="text-[12px] font-bold text-[#2E7D32]">
               Lihat Semua →
             </Link>

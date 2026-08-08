@@ -189,13 +189,11 @@ export default function HistoryPage() {
 
             <ChartPanel days={days} target={target} range={range} />
 
-            <SummaryCard days={days} target={target} />
-
             {entries.length > 0 && (
               <div className="pt-1">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-[15px] font-bold text-slate-900">Log Harian</h2>
+                    <h2 className="text-[14px] font-bold text-slate-900">Log Harian</h2>
                     <p className="text-xs text-slate-400">Timeline makanmu dari hari ke hari</p>
                   </div>
                   <Link href="/scan" className="text-[12px] font-bold text-[#2E7D32]">
@@ -356,34 +354,32 @@ function ChartPanel({
   range: "week" | "month";
 }) {
   const data = days;
-  const weeklyMax = Math.max(...data.map((d) => d.kalori), target ?? 0);
-  const chartTop = weeklyMax + 150;
+  const weeklyMax = Math.max(...data.map((d) => d.kalori), target ?? 0, 300);
+  const chartTop = Math.ceil(weeklyMax / 500) * 500;
   const maxVal = Math.max(0, ...data.filter((d) => !d.empty && !d.over).map((d) => d.kalori));
   return (
-    <div className="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+    <div className="rounded-2xl border border-slate-200/70 bg-white p-4 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
       <div className="flex items-center justify-between">
-        <h2 className="text-[15px] font-bold text-slate-900">Grafik Asupan Kalori</h2>
+        <h2 className="text-[14px] font-bold text-slate-900">Grafik Asupan Kalori</h2>
       </div>
-      <div className="mt-3 h-52">
+      <div className="mt-3 h-44">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
             <XAxis
               dataKey="label"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 11, fill: "#94a3b8" }}
+              tick={{ fontSize: 10, fill: "#94a3b8" }}
               interval={range === "month" ? 3 : 0}
             />
             <YAxis
-              width={34}
+              width={38}
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 10, fill: "#94a3b8" }}
               domain={[0, chartTop]}
-              tickCount={4}
-              tickFormatter={(v: number) =>
-                v >= 1000 ? `${(v / 1000).toLocaleString("id-ID")}rb` : String(v)
-              }
+              tickCount={5}
+              tickFormatter={(v: number) => v.toLocaleString("id-ID")}
             />
             <Tooltip
               cursor={{ fill: "#f1f5f9" }}
@@ -413,37 +409,6 @@ function ChartPanel({
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-      </div>
-    </div>
-  );
-}
-
-function SummaryCard({ days, target }: { days: DayTotals[]; target: number | null }) {
-  const filled = days.filter((d) => !d.empty);
-  const mean = filled.length
-    ? Math.round(filled.reduce((a, d) => a + d.kalori, 0) / filled.length)
-    : 0;
-  const reached = days.filter((d) => d.kalori > 0 && target && d.kalori <= target).length;
-  const rows = [
-    { label: "Kalori rata-rata", value: `${mean.toLocaleString("id-ID")} kcal` },
-    { label: "Target rata-rata", value: target ? `${target.toLocaleString("id-ID")} kcal` : "—" },
-    { label: "Hari mencapai target", value: target ? `${reached} hari` : "—" },
-  ];
-  return (
-    <div className="overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-sm">
-      <div className="px-5 pt-4">
-        <h2 className="text-[15px] font-bold text-slate-900">Ringkasan</h2>
-      </div>
-      <div className="mt-1">
-        {rows.map((r, i) => (
-          <div
-            key={r.label}
-            className={`flex items-center justify-between px-5 py-3.5 ${i > 0 ? "border-t border-slate-100" : ""} ${i === rows.length - 1 ? "pb-5" : ""}`}
-          >
-            <span className="text-[13px] font-semibold text-slate-600">{r.label}</span>
-            <span className="text-[14px] font-extrabold text-slate-900">{r.value}</span>
-          </div>
-        ))}
       </div>
     </div>
   );
