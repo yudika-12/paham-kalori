@@ -339,17 +339,17 @@ function Header({
       </div>
 
       {open && alerts.length === 0 && (
-        <div className="absolute right-0 top-14 z-40 w-[calc(100vw-2rem)] max-w-sm rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl shadow-slate-900/10 anim-notif-in">
-          <p className="text-sm font-bold text-slate-900">✨ Semua sudah sesuai target</p>
+        <div className="absolute right-0 top-14 z-40 w-[calc(100vw-2rem)] max-w-[21rem] rounded-2xl border border-slate-200 bg-white p-3 shadow-2xl shadow-slate-900/10 anim-notif-in">
+          <p className="text-[13px] font-bold text-slate-900">✨ Semua sudah sesuai target</p>
         </div>
       )}
       {open && alerts.length > 0 && (
-        <div className="absolute right-0 top-14 z-40 w-[calc(100vw-2rem)] max-w-sm rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10 anim-notif-in">
-          <div className="flex items-center justify-between border-b border-slate-100 px-3.5 py-2.5">
-            <p className="flex items-center gap-2 text-sm font-bold text-slate-900">
-              <span className="relative flex h-2.5 w-2.5">
+        <div className="absolute right-0 top-14 z-40 w-[calc(100vw-2rem)] max-w-[21rem] rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10 anim-notif-in">
+          <div className="flex items-center justify-between border-b border-slate-100 px-3 py-2">
+            <p className="flex items-center gap-2 text-[13px] font-bold text-slate-900">
+              <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
-                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-red-500" />
               </span>
               Notifikasi
               <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-600">{alerts.length}</span>
@@ -365,23 +365,23 @@ function Header({
             </button>
           </div>
 
-          <div className="max-h-80 space-y-2 overflow-y-auto px-3 py-2.5">
+          <div className="max-h-[22rem] space-y-1.5 overflow-y-auto px-2.5 py-2">
             {alerts.map((a) => (
               <div
                 key={a.title}
-                className="rounded-xl border border-slate-100 bg-slate-50/60 p-3"
+                className="rounded-xl border border-slate-100 bg-slate-50/60 p-2.5"
               >
-                <p className="text-[13px] font-bold leading-snug text-slate-900">
-                  <span className="mr-1.5">💡</span>
+                <p className="text-xs font-bold leading-snug text-slate-900">
+                  <span className="mr-1">💡</span>
                   {a.title}
                 </p>
-                <p className="mt-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-400">
+                <p className="mt-1 text-[9px] font-bold uppercase tracking-wide text-slate-400">
                   Bisa coba:
                 </p>
-                <ul className="mt-1 space-y-1">
+                <ul className="mt-0.5 space-y-1">
                   {a.suggestions.map((s) => (
-                    <li key={s} className="flex items-start gap-2 text-[13px] leading-snug text-slate-600">
-                      <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[10px] font-bold text-emerald-700">
+                    <li key={s} className="flex items-start gap-1.5 text-xs leading-snug text-slate-600">
+                      <span className="mt-[3px] flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[8px] font-bold text-emerald-700">
                         ✓
                       </span>
                       {s}
@@ -483,7 +483,7 @@ function MealRow({ entry }: { entry: FoodEntry }) {
 function CoachFloating({ profileId }: { profileId: string | null }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([
-    { role: "assistant", content: "Halo! Aku Coach AI kamu. Mau tanya soal menu, kalori, atau makro? 😊" },
+    { role: "assistant", content: "Halo! Aku siap bantu soal menu, kalori, dan makro kamu. 😊" },
   ]);
   const [input, setInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
@@ -492,6 +492,13 @@ function CoachFloating({ profileId }: { profileId: string | null }) {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, chatLoading]);
+
+  useEffect(() => {
+    document.body.style.overflow = isOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
 
   async function sendChat(text: string) {
     if (!profileId || chatLoading) return;
@@ -536,16 +543,12 @@ function CoachFloating({ profileId }: { profileId: string | null }) {
         <div className="fixed bottom-[4.5rem] right-4 z-40 flex flex-col items-end">
           <button
             onClick={() => setIsOpen(true)}
-            className="relative flex items-center gap-1.5 rounded-full bg-gradient-to-br from-emerald-400 to-[#2E7D32] py-2.5 pl-3 pr-4 text-sm font-bold text-white shadow-xl shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-2xl"
+            className="relative flex items-center gap-1.5 rounded-full bg-gradient-to-br from-emerald-400 to-[#2E7D32] px-3 py-2 text-xs font-bold text-white shadow-xl shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-2xl"
           >
-            <span className="absolute -top-0.5 right-2 rounded-full bg-amber-400 px-1.5 py-[2px] text-[9px] font-extrabold leading-none text-amber-950 shadow-sm">
-              AI
-            </span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-              <path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z" />
-              <path d="M5 3v4M3 5h4M19 17v4M17 19h4" />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" />
             </svg>
-            <span className="hidden sm:inline text-[13px]">Tanya AI</span>
+            <span className="hidden sm:inline">Tanya Coach</span>
           </button>
         </div>
       )}
@@ -553,31 +556,31 @@ function CoachFloating({ profileId }: { profileId: string | null }) {
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40 bg-slate-900/20 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
-          <aside className="fixed right-0 top-0 z-50 flex h-dvh w-[min(23rem,100vw)] flex-col border-l border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 anim-chat-side-in">
-            <div className="flex items-center gap-2.5 border-b border-slate-100 px-4 py-3 dark:border-slate-800">
-              <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-[#2E7D32] text-white">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+          <aside className="fixed right-0 top-0 z-50 flex h-dvh w-[min(21rem,100vw)] flex-col border-l border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 anim-chat-side-in">
+            <div className="flex items-center gap-2 border-b border-slate-100 px-3.5 py-2.5 dark:border-slate-800">
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-[#2E7D32] text-white">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4.5 w-4.5">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" />
                   <path d="M8 9h8M8 13h5" />
                 </svg>
               </span>
               <div className="min-w-0 flex-1">
-                <h2 className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">Coach AI</h2>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500">Chat pribadi dengan AI</p>
+                <h2 className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">Coach</h2>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500">Siap membantu kamu hari ini</p>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
                 title="Tutup"
                 className="shrink-0 rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
                   <path d="M18 6 6 18M6 6l12 12" />
                 </svg>
               </button>
             </div>
 
-            <div className="px-4 pt-2.5">
-              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">Tanya cepat</p>
+            <div className="px-3.5 pt-2">
+              <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Tanya cepat</p>
               <div className="mt-1.5 flex flex-wrap gap-1.5">
                 {QUICK_ASKS.map((q) => (
                   <button
@@ -591,12 +594,12 @@ function CoachFloating({ profileId }: { profileId: string | null }) {
               </div>
             </div>
 
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden p-4">
-              <div className="max-h-full flex-1 space-y-3 overflow-y-auto pr-1">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-3.5 pt-3 pb-3">
+              <div className="max-h-full flex-1 space-y-2.5 overflow-y-auto pr-1">
                 {messages.map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                     <div
-                      className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-xs leading-relaxed ${
+                      className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3 py-2 text-xs leading-relaxed ${
                         msg.role === "user"
                           ? "rounded-br-md bg-[#2E7D32] text-white"
                           : "rounded-bl-md bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-100"
@@ -608,7 +611,7 @@ function CoachFloating({ profileId }: { profileId: string | null }) {
                 ))}
                 {chatLoading && (
                   <div className="flex justify-start">
-                    <div className="flex gap-1 rounded-2xl rounded-bl-md bg-slate-100 px-3.5 py-3 dark:bg-slate-800">
+                    <div className="flex gap-1 rounded-2xl rounded-bl-md bg-slate-100 px-3 py-2.5 dark:bg-slate-800">
                       <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400" />
                       <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400 [animation-delay:0.1s]" />
                       <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-slate-400 [animation-delay:0.2s]" />
@@ -618,17 +621,17 @@ function CoachFloating({ profileId }: { profileId: string | null }) {
                 <div ref={chatEndRef} />
               </div>
 
-              <form onSubmit={handleChatSubmit} className="mt-3 flex gap-2">
+              <form onSubmit={handleChatSubmit} className="mt-2.5 flex gap-2">
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Tanya soal makanan & kalori..."
-                  className="min-w-0 flex-1 rounded-full border border-slate-200 px-4 py-2.5 text-sm outline-none transition focus:border-emerald-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
+                  className="min-w-0 flex-1 rounded-full border border-slate-200 px-3.5 py-2 text-xs outline-none transition focus:border-emerald-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"
                 />
                 <button
                   type="submit"
                   disabled={chatLoading || !input.trim()}
-                  className="shrink-0 rounded-full bg-[#2E7D32] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:opacity-40"
+                  className="shrink-0 rounded-full bg-[#2E7D32] px-3.5 py-2 text-xs font-bold text-white transition hover:bg-emerald-700 disabled:opacity-40"
                 >
                   Kirim
                 </button>

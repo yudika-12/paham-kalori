@@ -12,7 +12,7 @@ const jakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Paham Kalori — Foto Makanan, Ketahui Kalorinya",
   description:
-    "Foto makananmu, AI hitung kalorinya otomatis. Lacak asupan harian dan jaga target kalorimu dengan bantuan Gemini.",
+    "Foto makananmu dan langsung cek hitungan kalorinya. Lacak asupan harian dan jaga target kalorimu dengan mudah.",
 };
 
 export default function RootLayout({

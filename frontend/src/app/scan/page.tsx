@@ -383,7 +383,7 @@ function UploadView({
             </svg>
           </span>
           <p className="text-[12px] leading-snug text-slate-600">
-            Foto hanya digunakan untuk analisis AI dan <span className="font-semibold text-slate-800">tidak akan disimpan</span>.
+            Foto hanya digunakan untuk menganalisis dan <span className="font-semibold text-slate-800">tidak akan disimpan</span>.
           </p>
         </div>
       </div>
@@ -420,7 +420,7 @@ function AnalyzingView({ onReset }: { onReset: () => void }) {
           <span className="text-3xl">🔍</span>
         </div>
         <p className="mt-6 text-[15px] font-bold text-slate-800">Menganalisis makanan...</p>
-        <p className="mt-1 text-[12px] text-slate-400">AI menghitung kalori &amp; makronutrien</p>
+        <p className="mt-1 text-[12px] text-slate-400">Hitung kalori &amp; makronutrien otomatis</p>
       </div>
     </div>
   );
@@ -589,7 +589,7 @@ function ResultView({
 
       <div className="overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-sm">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={preview} alt={result.name} className="h-40 w-full object-cover" />
+        <img src={preview} alt={result.name} className="h-44 w-full bg-slate-100 object-contain" />
 
         <div className="p-4">
           <div>
@@ -673,7 +673,7 @@ function ResultView({
                     <path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.3.3.5.8.5 1.2V15h7v-.3c0-.4.2-.9.5-1.2A6 6 0 0 0 12 3Z" />
                   </svg>
                 </span>
-                <h3 className="text-[13px] font-bold text-slate-900">Rekomendasi AI</h3>
+                <h3 className="text-[13px] font-bold text-slate-900">Rekomendasi</h3>
               </div>
               <ul className="mt-2.5 space-y-1.5">
                 {recs.map((r) => (
