@@ -6,6 +6,7 @@ import { resolveProfile } from "@/lib/client/profile-local";
 import { useRequireAuth } from "@/lib/client/use-require-auth";
 import { useSession, signOut } from "next-auth/react";
 import { dailyCalorieTarget } from "@pk/core";
+import { NEUTRAL_BMI } from "@/lib/design";
 
 const GOAL_LABEL: Record<string, string> = {
   lose: "Menurunkan berat badan",
@@ -22,10 +23,35 @@ interface ProfileInfo {
 }
 
 function bmiStatusClass(bmi: number): { label: string; color: string; bg: string } {
-  if (bmi < 18.5) return { label: "Kurang", color: "#f59e0b", bg: "#fef3c7" };
-  if (bmi < 25) return { label: "Normal", color: "#2E7D32", bg: "#dcfce7" };
-  if (bmi < 30) return { label: "Berlebih", color: "#ea580c", bg: "#ffedd5" };
-  return { label: "Obesitas", color: "#dc2626", bg: "#fee2e2" };
+  if (bmi < 18.5) return { label: "Kurang", color: "#B45309", bg: "#FFF7E0" };
+  if (bmi < 25) return { label: "Normal", color: "#1E8E5A", bg: "#E7F6EF" };
+  if (bmi < 30) return { label: "Berlebih", color: "#B45309", bg: "#FFF7E0" };
+  return { label: "Obesitas", color: "#C62828", bg: "#FDE8E8" };
+}
+
+function bmiInsight(category: string): { title: string; body: string } {
+  switch (category) {
+    case "Kurang":
+      return {
+        title: "Satu langkah kecil setiap hari sudah bagus",
+        body: "Beratmu sedikit di bawah rentang sehat. Menambah kalori bergizi secara bertahap — protein, lemak baik, nasi/roti gandum — bisa membantu tubuh terasa lebih berenergi.",
+      };
+    case "Normal":
+      return {
+        title: "Kamu berada di rentang sehat 👏",
+        body: "Pertahankan pola makan dan aktivitas yang sekarang. Dengan target kalori yang sudah disesuaikan, kamu bisa tetap fleksibel di hari-hari yang padat.",
+      };
+    case "Berlebih":
+      return {
+        title: "Perubahan kecil lebih penting daripada sebenarnya",
+        body: "Kamu sedikit di atas rentang sehat. Coba mulai dari satu kebiasaan kecil — porsi teratur, kurangi gorengan, atau jalan kaki 20 menit — tanpa perlu pola makan ekstrem.",
+      };
+    default:
+      return {
+        title: "Yang terpenting adalah konsistensi, bukan kesempurnaan",
+        body: "BMI hanyalah salah satu angka, dan tubuhmu punya banyak cerita. Mulai dari satu kebiasaan kecil yang realistis, catat makananmu, dan biarkan data memandu langkah berikutnya. Konsultasi dengan tenaga kesehatan juga selalu boleh.",
+      };
+  }
 }
 
 export default function ProfilPage() {
@@ -34,6 +60,7 @@ export default function ProfilPage() {
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<ProfileInfo | null>(null);
   const [metrics, setMetrics] = useState<{ bmi: number; bmiCategory: string; tdee: number } | null>(null);
+  const [recoOpen, setRecoOpen] = useState(false);
   const fetchedRef = useRef(false);
 
   const load = useCallback(async () => {
@@ -141,19 +168,56 @@ export default function ProfilPage() {
                     divide
                   />
                   {metrics ? (
-                    <ListRow
-                      icon={
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-                          <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                    <>
+                      <ListRow
+                        icon={
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                          </svg>
+                        }
+                        label="IMT (BMI)"
+                        value={String(metrics.bmi)}
+                        badge={bmiStatus ? { label: bmiStatus.label, color: bmiStatus.color, bg: bmiStatus.bg } : undefined}
+                        divide
+                        last
+                      />
+                      <button
+                        onClick={() => setRecoOpen((o) => !o)}
+                        className="flex w-full items-center justify-between border-t border-slate-100 px-4 py-3 text-left transition hover:bg-slate-50"
+                      >
+                        <span className="flex items-center gap-2 text-[13px] font-bold" style={{ color: NEUTRAL_BMI.color }}>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M12 16v-4M12 8h.01" />
+                          </svg>
+                          Lihat rekomendasi
+                        </span>
+                        <svg
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className={`h-4 w-4 text-slate-300 transition-transform ${recoOpen ? "rotate-180" : ""}`}
+                        >
+                          <path d="m6 9 6 6 6-6" />
                         </svg>
-                      }
-                      label="IMT (BMI)"
-                      value={String(metrics.bmi)}
-                      badge={bmiStatus ? { label: bmiStatus.label, color: bmiStatus.color, bg: bmiStatus.bg } : undefined}
-                      divide
-                      last
-/>
-                ) : null}
+                      </button>
+                      {recoOpen && bmiStatus && (
+                        <div className="px-4 pb-4 anim-notif-in">
+                          <div className="rounded-2xl p-3.5" style={{ background: NEUTRAL_BMI.bg }}>
+                            <p className="text-[13px] font-bold" style={{ color: NEUTRAL_BMI.color }}>
+                              {bmiInsight(bmiStatus.label).title}
+                            </p>
+                            <p className="mt-1 text-[12px] leading-relaxed text-slate-600">
+                              {bmiInsight(bmiStatus.label).body}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : null}
                 </div>
                 </section>
 
@@ -208,7 +272,8 @@ function ListRow({
   badge,
   chevron = false,
   divide = false,
-  last = false,
+  danger = false,
+  onClick,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -217,17 +282,15 @@ function ListRow({
   chevron?: boolean;
   divide?: boolean;
   last?: boolean;
+  danger?: boolean;
+  onClick?: () => void;
 }) {
-  return (
-    <div
-      className={`flex items-center gap-3 bg-white px-4 py-3.5 ${
-        divide ? "border-t border-slate-100" : ""
-      } ${last ? "" : ""}`}
-    >
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
+  const inner = (
+    <>
+      <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${danger ? "bg-red-50 text-red-500" : "bg-emerald-50 text-emerald-700"}`}>
         {icon}
       </span>
-      <span className="flex-1 text-[14px] font-semibold text-slate-800">{label}</span>
+      <span className={`flex-1 text-[14px] font-semibold ${danger ? "text-red-600" : "text-slate-800"}`}>{label}</span>
       {value ? <span className="text-[13px] font-bold text-slate-900">{value}</span> : null}
       {badge ? (
         <span className="rounded-full px-2.5 py-0.5 text-[11px] font-bold" style={{ color: badge.color, background: badge.bg }}>
@@ -239,6 +302,14 @@ function ListRow({
           <path d="m9 18 6-6-6-6" />
         </svg>
       ) : null}
-    </div>
+    </>
+  );
+  const cls = `flex w-full items-center gap-3 bg-white px-4 py-3.5 text-left transition ${divide ? "border-t border-slate-100" : ""} ${danger ? "hover:bg-red-50/50" : onClick ? "hover:bg-slate-50" : ""}`;
+  return onClick ? (
+    <button type="button" onClick={onClick} className={cls}>
+      {inner}
+    </button>
+  ) : (
+    <div className={cls}>{inner}</div>
   );
 }

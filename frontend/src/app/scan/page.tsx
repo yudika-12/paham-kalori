@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
+import ErrorBanner from "@/components/ErrorBanner";
 import { resolveProfileId } from "@/lib/client/profile-local";
 import { imageCompressor } from "@/lib/image";
 import { useRequireAuth } from "@/lib/client/use-require-auth";
@@ -246,6 +247,7 @@ export default function ScanPage() {
         {showUpload ? (
           <UploadView
             dragging={dragging}
+            error={error}
             onDragEnter={() => setDragging(true)}
             onDragLeave={() => setDragging(false)}
             onDrop={(e) => {
@@ -266,6 +268,7 @@ export default function ScanPage() {
             editingName={editingName}
             nameDraft={nameDraft}
             estimating={estimating}
+            error={error}
             onNameDraftChange={setNameDraft}
             onStartEdit={startEditName}
             onCancelEdit={() => setEditingName(false)}
@@ -275,6 +278,7 @@ export default function ScanPage() {
         ) : (
           <ActionsView
             preview={preview!}
+            error={error}
             onPickGallery={() => fileRef.current?.click()}
             onCapture={openCamera}
             onAnalyze={analyze}
@@ -282,12 +286,6 @@ export default function ScanPage() {
           />
         )}
 
-        {error && (
-          <p className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-600 dark:bg-red-900/20 dark:text-red-400">
-            {error}
-          </p>
-        )}
-        <div className="h-4" />
       </main>
 
       {cameraOpen && (
@@ -317,6 +315,7 @@ export default function ScanPage() {
 
 function UploadView({
   dragging,
+  error,
   onDragEnter,
   onDragLeave,
   onDrop,
@@ -324,6 +323,7 @@ function UploadView({
   onCapture,
 }: {
   dragging: boolean;
+  error: string;
   onDragEnter: () => void;
   onDragLeave: () => void;
   onDrop: (e: React.DragEvent) => void;
@@ -331,60 +331,81 @@ function UploadView({
   onCapture: () => void;
 }) {
   return (
-    <div
-      onDragEnter={(e) => {
-        e.preventDefault();
-        onDragEnter();
-      }}
-      onDragOver={(e) => e.preventDefault()}
-      onDragLeave={onDragLeave}
-      onDrop={onDrop}
-      className={`rounded-3xl border-2 p-2 transition ${
-        dragging ? "border-[#2E7D32] bg-emerald-50" : "border-transparent"
-      }`}
-    >
-      <button
-        onClick={onPickGallery}
-        className="mb-3 flex w-full items-center gap-3 rounded-3xl border border-slate-200/70 bg-white p-4 text-left shadow-[0_8px_24px_rgba(15,23,42,0.05)] transition hover:border-emerald-300 hover:shadow-md"
+    <div>
+      <div
+        onDragEnter={(e) => {
+          e.preventDefault();
+          onDragEnter();
+        }}
+        onDragOver={(e) => e.preventDefault()}
+        onDragLeave={onDragLeave}
+        onDrop={onDrop}
+        className={`rounded-3xl border-2 p-2 transition ${
+          dragging ? "border-[#2E7D32] bg-emerald-50" : "border-transparent"
+        }`}
       >
-        <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-emerald-100">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8">
-            <path d="M9 3H5a2 2 0 0 0-2 2v4M15 3h4a2 2 0 0 1 2 2v4M9 21H5a2 2 0 0 1-2-2v-4M15 21h4a2 2 0 0 0 2-2v-4" />
-            <path d="M12 8v8M8 12h8" />
-          </svg>
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-[15px] font-bold text-slate-900">Upload dari Galeri</span>
-          <span className="block text-[12px] text-slate-400">Pilih foto dari galeri</span>
-        </span>
-      </button>
+        <button
+          onClick={onPickGallery}
+          className="mb-3 flex w-full items-center gap-3 rounded-3xl border border-slate-200/70 bg-white p-4 text-left shadow-[0_8px_24px_rgba(15,23,42,0.05)] transition hover:border-emerald-300 hover:shadow-md"
+        >
+          <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8">
+              <path d="M9 3H5a2 2 0 0 0-2 2v4M15 3h4a2 2 0 0 1 2 2v4M9 21H5a2 2 0 0 1-2-2v-4M15 21h4a2 2 0 0 0 2-2v-4" />
+              <path d="M12 8v8M8 12h8" />
+            </svg>
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[15px] font-bold text-slate-900">Upload dari Galeri</span>
+            <span className="block text-[12px] text-slate-400">Pilih foto dari galeri</span>
+          </span>
+        </button>
 
-      <button
-        onClick={onCapture}
-        className="mb-5 flex w-full items-center gap-3 rounded-3xl border border-emerald-200/70 bg-white p-4 text-left shadow-[0_8px_24px_rgba(15,23,42,0.05)] transition hover:border-[#2E7D32] hover:shadow-md"
-      >
-        <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-emerald-100">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8">
-            <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z" />
-            <circle cx="12" cy="13" r="3" />
-          </svg>
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-[15px] font-bold text-slate-900">Ambil Foto</span>
-          <span className="block text-[12px] text-slate-400">Gunakan kamera</span>
-        </span>
-      </button>
+        <button
+          onClick={onCapture}
+          className="mb-5 flex w-full items-center gap-3 rounded-3xl border border-emerald-200/70 bg-white p-4 text-left shadow-[0_8px_24px_rgba(15,23,42,0.05)] transition hover:border-[#2E7D32] hover:shadow-md"
+        >
+          <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8">
+              <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z" />
+              <circle cx="12" cy="13" r="3" />
+            </svg>
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[15px] font-bold text-slate-900">Ambil Foto</span>
+            <span className="block text-[12px] text-slate-400">Gunakan kamera</span>
+          </span>
+        </button>
 
-      <div className="flex items-start gap-2.5 rounded-2xl bg-emerald-50/70 p-3.5 ring-1 ring-emerald-100">
-        <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
-            <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
-          </svg>
-        </span>
-        <p className="text-[12px] leading-snug text-slate-600">
-          Foto hanya digunakan untuk analisis AI dan <span className="font-semibold text-slate-800">tidak akan disimpan</span>.
-        </p>
+        <div className="flex items-start gap-2.5 rounded-2xl bg-emerald-50/70 p-3.5 ring-1 ring-emerald-100">
+          <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-100">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#2E7D32" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3.5 w-3.5">
+              <path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z" />
+            </svg>
+          </span>
+          <p className="text-[12px] leading-snug text-slate-600">
+            Foto hanya digunakan untuk analisis AI dan <span className="font-semibold text-slate-800">tidak akan disimpan</span>.
+          </p>
+        </div>
       </div>
+
+      {error && <div className="mt-4"><ErrorBanner>{error}</ErrorBanner></div>}
+    </div>
+  );
+}
+
+function PageHeader({ title, onBack }: { title: string; onBack: () => void }) {
+  return (
+    <div className="relative mb-3 flex items-center justify-center">
+      <button
+        onClick={onBack}
+        title="Kembali"
+        className="absolute left-0 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+      </button>
+      <h1 className="text-lg font-extrabold text-slate-900">{title}</h1>
     </div>
   );
 }
@@ -392,10 +413,7 @@ function UploadView({
 function AnalyzingView({ onReset }: { onReset: () => void }) {
   return (
     <div>
-      <div className="flex items-center gap-3">
-        <BackButton onClick={onReset} />
-        <h1 className="text-lg font-extrabold text-slate-900">Hasil Analisis</h1>
-      </div>
+      <PageHeader title="Hasil Analisis" onBack={onReset} />
       <div className="mt-6 flex flex-col items-center justify-center rounded-3xl border border-slate-200/70 bg-white px-6 py-14 text-center shadow-sm">
         <div className="relative flex h-24 w-24 items-center justify-center">
           <span className="absolute inset-0 animate-spin rounded-full border-4 border-emerald-100 border-t-[#2E7D32]" />
@@ -410,71 +428,116 @@ function AnalyzingView({ onReset }: { onReset: () => void }) {
 
 function ActionsView({
   preview,
+  error,
   onPickGallery,
   onCapture,
   onAnalyze,
   onReset,
 }: {
   preview: string;
+  error: string;
   onPickGallery: () => void;
   onCapture: () => void;
   onAnalyze: () => void;
   onReset: () => void;
 }) {
+  const hasError = error !== "";
   return (
     <div>
-      <div className="mb-3 flex items-center gap-3">
-        <BackButton onClick={onReset} />
-        <div>
-          <h1 className="text-lg font-extrabold text-slate-900">Tambah Makanan</h1>
-        </div>
-      </div>
+      <PageHeader title="Tambah Makanan" onBack={onReset} />
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={preview}
         alt="Foto makanan"
         className="max-h-72 w-full rounded-3xl bg-slate-100 object-cover shadow-sm"
       />
-      <div key="actions" className="mt-4 flex flex-wrap items-center justify-center gap-3 anim-notif-in">
-        <button
-          onClick={onPickGallery}
-          className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
-        >
-          Ganti foto
-        </button>
-        <button
-          onClick={onCapture}
-          className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
-        >
-          📷 Foto ulang
-        </button>
-        <button
-          onClick={onReset}
-          className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 transition hover:bg-red-50 hover:text-red-500"
-        >
-          Hapus
-        </button>
+      <div key="actions" className="mt-4 anim-notif-in">
+        <div className="grid grid-cols-3 gap-2.5">
+          <QuickAction
+            label="Ganti Foto"
+            onClick={onPickGallery}
+            icon={
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3Z" />
+                <circle cx="12" cy="13" r="3" />
+              </svg>
+            }
+          />
+          <QuickAction
+            label="Foto Ulang"
+            onClick={onCapture}
+            icon={
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+              </svg>
+            }
+          />
+          <QuickAction
+            label="Hapus"
+            onClick={onReset}
+            danger
+            icon={
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+              </svg>
+            }
+          />
+        </div>
+
+        {error && <div className="mt-4"><ErrorBanner>{error}</ErrorBanner></div>}
+
         <button
           onClick={onAnalyze}
-          className="rounded-xl bg-[#2E7D32] px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-emerald-700/25 transition hover:bg-emerald-700"
+          className={
+            hasError
+              ? "mt-4 flex w-full items-center justify-center gap-1.5 rounded-2xl border-2 border-[#E85D5D] py-3.5 text-sm font-bold text-[#B93A3A] transition hover:bg-[#FDEDED]"
+              : "mt-4 flex w-full items-center justify-center gap-1.5 rounded-2xl bg-[#2E7D32] py-3.5 text-sm font-bold text-white shadow-lg shadow-emerald-700/25 transition hover:bg-emerald-700"
+          }
         >
-          Hitung Kalori ✨
+          {hasError ? (
+            <>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                <path d="M3 3v5h5" />
+              </svg>
+              Coba Hitung Lagi
+            </>
+          ) : (
+            "Hitung Kalori ✨"
+          )}
         </button>
       </div>
     </div>
   );
 }
 
-function BackButton({ onClick }: { onClick: () => void }) {
+function QuickAction({
+  label,
+  icon,
+  onClick,
+  danger = false,
+}: {
+  label: string;
+  icon: React.ReactNode;
+  onClick: () => void;
+  danger?: boolean;
+}) {
   return (
     <button
       onClick={onClick}
-      title="Kembali"
-      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm transition hover:bg-slate-50"
+      className={`flex flex-col items-center gap-1.5 rounded-2xl border border-slate-200 bg-white py-3 transition ${
+        danger ? "hover:border-red-200 hover:bg-red-50/60" : "hover:border-emerald-300 hover:bg-emerald-50/60"
+      }`}
     >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-        <path d="M19 12H5M12 19l-7-7 7-7" />
-      </svg>
+      <span
+        className={`flex h-10 w-10 items-center justify-center rounded-full ${
+          danger ? "bg-red-50 text-red-500" : "bg-slate-100 text-slate-600"
+        }`}
+      >
+        {icon}
+      </span>
+      <span className="text-[11px] font-bold text-slate-600">{label}</span>
     </button>
   );
 }
@@ -486,6 +549,7 @@ function ResultView({
   editingName,
   nameDraft,
   estimating,
+  error,
   onNameDraftChange,
   onStartEdit,
   onCancelEdit,
@@ -498,6 +562,7 @@ function ResultView({
   editingName: boolean;
   nameDraft: string;
   estimating: boolean;
+  error: string;
   onNameDraftChange: (v: string) => void;
   onStartEdit: () => void;
   onCancelEdit: () => void;
@@ -520,19 +585,15 @@ function ResultView({
 
   return (
     <div>
-      <div className="mb-3 flex items-center gap-3">
-        <BackButton onClick={onReset} />
-        <h1 className="text-lg font-extrabold text-slate-900">Hasil Analisis</h1>
-      </div>
+      <PageHeader title="Hasil Analisis" onBack={onReset} />
 
       <div className="overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-sm">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={preview} alt={result.name} className="h-48 w-full object-cover" />
 
         <div className="p-5">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-bold uppercase tracking-wide text-emerald-700">{result.mealType}</p>
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-wide text-emerald-700">{result.mealType}</p>
               {editingName ? (
                 <div className="mt-1">
                   <input
@@ -575,13 +636,6 @@ function ResultView({
               )}
               <p className="mt-1 text-[11px] leading-relaxed text-slate-500">{result.note}</p>
             </div>
-            <div className="shrink-0 text-right">
-              <p className="text-[30px] font-extrabold leading-none text-orange-500">
-                {result.calories.toLocaleString("id-ID")}
-              </p>
-              <p className="text-[11px] font-bold uppercase tracking-wide text-orange-400">kkal</p>
-            </div>
-          </div>
 
           <div className="mt-4 inline-flex items-center gap-2 rounded-xl px-3 py-1.5" style={{ background: gradeBg }}>
             <span
@@ -598,11 +652,18 @@ function ResultView({
             </div>
           </div>
 
-          <div className="mt-5 space-y-3 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-100">
-            <MacroBullet label="Karbohidrat" grams={result.carbs ?? 0} color="#2E7D32" />
-            <MacroBullet label="Protein" grams={result.protein ?? 0} color="#2563eb" />
-            <MacroBullet label="Lemak" grams={result.fat ?? 0} color="#f59e0b" />
+          <div className="mt-5 space-y-2.5">
+            <NutriRow kind="kal" label="Kalori" value={result.calories} unit="kcal" />
+            <NutriRow kind="carbs" label="Karbohidrat" value={result.carbs ?? 0} unit="g" />
+            <NutriRow kind="protein" label="Protein" value={result.protein ?? 0} unit="g" />
+            <NutriRow kind="fat" label="Lemak" value={result.fat ?? 0} unit="g" />
           </div>
+
+          {error ? (
+            <div className="mt-4">
+              <ErrorBanner>{error}</ErrorBanner>
+            </div>
+          ) : null}
 
           {recs.length > 0 && (
             <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4">
@@ -650,16 +711,60 @@ function ResultView({
   );
 }
 
-function MacroBullet({ label, grams, color }: { label: string; grams: number; color: string }) {
+type NutriKind = "kal" | "carbs" | "protein" | "fat";
+
+function NutriRow({
+  kind,
+  label,
+  value,
+  unit,
+}: {
+  kind: NutriKind;
+  label: string;
+  value: number;
+  unit: string;
+}) {
+  const styles: Record<NutriKind, { color: string; bg: string }> = {
+    kal: { color: "#EF4444", bg: "#FEE2E2" },
+    carbs: { color: "#F5A623", bg: "#FEF3E2" },
+    protein: { color: "#2FA96B", bg: "#E7F6EF" },
+    fat: { color: "#3B82F6", bg: "#E8F0FE" },
+  };
+  const s = styles[kind];
+  const glyph =
+    kind === "kal" ? (
+      <path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-5 4-7 5-11Z" />
+    ) : kind === "carbs" ? (
+      <>
+        <path d="M2 22 16 8" />
+        <path d="M17.5 8 16 9.5 14.5 8" />
+        <path d="M20.5 5 19 6.5 17.5 5" />
+        <path d="M20.5 11l-1.5 1.5-1.5-1.5" />
+        <path d="M12 6l-1.5 1.5L9 6" />
+        <path d="M12 12l-1.5 1.5L9 12" />
+      </>
+    ) : kind === "protein" ? (
+      <>
+        <path d="M6.5 3h11C18.5 5 20 7.5 20 10.5c0 4.5-3.1 8.5-7 8.5s-7-4-7-8.5C6 7.5 6.5 5 6.5 3Z" />
+        <path d="M9 8.5c.5 1.2 1.5 2 2.5 2.2" />
+      </>
+    ) : (
+      <path d="M12 2.7S6 9 6 14a6 6 0 0 0 12 0c0-5-6-11.3-6-11.3Z" />
+    );
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <span className="h-2.5 w-2.5 rounded-full" style={{ background: color }} />
-        <span className="text-[13px] font-semibold text-slate-700">{label}</span>
+    <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200/70 bg-white p-3">
+      <div className="flex min-w-0 items-center gap-3">
+        <span
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white"
+          style={{ background: s.color }}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4.5 w-4.5">{glyph}</svg>
+        </span>
+        <span className="text-[13px] font-bold text-slate-700">{label}</span>
       </div>
-      <div>
-        <span className="text-sm font-bold text-slate-900">{grams.toLocaleString("id-ID")}</span>
-        <span className="ml-0.5 text-[11px] font-medium text-slate-400">g</span>
+      <div className="shrink-0 text-right">
+        <span className="text-[15px] font-extrabold text-slate-900">{value.toLocaleString("id-ID")}</span>
+        <span className="ml-0.5 text-[11px] font-semibold text-slate-400">{unit}</span>
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ import { resolveProfile } from "@/lib/client/profile-local";
 import { useRequireAuth } from "@/lib/client/use-require-auth";
 import { FoodEntry, Metrics, dailyCalorieTarget } from "@pk/core";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from "recharts";
-import { thisWeek, thisMonth, nutritionGrade } from "@/lib/nutrition-stats";
+import { thisWeek, thisMonth, nutritionGrade, DayTotals } from "@/lib/nutrition-stats";
 
 const ACCENT = "#2E7D32";
 const MAIN_SLOTS = ["Makan Pagi", "Makan Siang", "Makan Malam"] as const;
@@ -70,10 +70,29 @@ export default function HistoryPage() {
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [goal, setGoal] = useState("health");
   const [range, setRange] = useState<"week" | "month">("week");
+  const [offset, setOffset] = useState(0);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const fetchedRef = useRef(false);
   const target = metrics ? dailyCalorieTarget(metrics.tdee, goal) : null;
+
+  const periodStart = useMemo(() => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    if (range === "week") {
+      const dow = (now.getDay() + 6) % 7;
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - dow);
+      monday.setDate(monday.getDate() + offset * 7);
+      return monday;
+    }
+    return new Date(now.getFullYear(), now.getMonth() + offset, 1);
+  }, [range, offset]);
+
+  const days = useMemo(
+    () => (range === "week" ? thisWeek(entries, target, periodStart) : thisMonth(entries, target, periodStart)),
+    [entries, target, range, periodStart]
+  );
 
   const load = useCallback(async () => {
     try {
@@ -160,16 +179,19 @@ export default function HistoryPage() {
           </div>
         ) : (
           <div className="mt-4 space-y-5">
-            <RangePanel range={range} onRange={setRange} />
-            <DateRangeSelector range={range} />
-
-            <ChartPanel
+            <RangePanel range={range} onRange={(r) => { setOffset(0); setRange(r); }} />
+            <DateRangeSelector
               range={range}
-              entries={entries}
-              target={target}
+              periodStart={periodStart}
+              onPrev={() => setOffset((o) => o - 1)}
+              onNext={() => setOffset((o) => o + 1)}
             />
 
-            <TargetReachedCard entries={entries} range={range} target={target} />
+            <ChartPanel days={days} target={target} range={range} />
+
+            <TargetReachedCard days={days} target={target} />
+
+            <SummaryCard days={days} target={target} />
 
             {entries.length > 0 && (
               <div className="pt-1">
@@ -284,34 +306,40 @@ function RangePanel({ range, onRange }: { range: "week" | "month"; onRange: (r: 
   );
 }
 
-function DateRangeSelector({ range }: { range: "week" | "month" }) {
-  const now = new Date();
+function DateRangeSelector({
+  range,
+  periodStart,
+  onPrev,
+  onNext,
+}: {
+  range: "week" | "month";
+  periodStart: Date;
+  onPrev: () => void;
+  onNext: () => void;
+}) {
   const labels =
     range === "week"
       ? (() => {
-          const d = new Date(now);
-          const dow = (d.getDay() + 6) % 7;
-          d.setDate(d.getDate() - dow);
-          const start = new Date(d);
-          const end = new Date(d);
+          const start = new Date(periodStart);
+          const end = new Date(periodStart);
           end.setDate(end.getDate() + 6);
           const fmt = (x: Date) =>
             x.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
           return `${fmt(start)} – ${fmt(end)}`;
         })()
-      : now.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
+      : periodStart.toLocaleDateString("id-ID", { month: "long", year: "numeric" });
 
   const btn =
     "flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50";
   return (
     <div className="flex items-center justify-between px-1">
-      <button className={btn} aria-label="Periode sebelumnya" onClick={() => {}}>
+      <button className={btn} aria-label="Periode sebelumnya" onClick={onPrev}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
           <path d="M15 18l-6-6 6-6" />
         </svg>
       </button>
       <p className="text-center text-[13px] font-bold text-slate-700">{labels}</p>
-      <button className={btn} aria-label="Periode berikutnya" onClick={() => {}}>
+      <button className={btn} aria-label="Periode berikutnya" onClick={onNext}>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
           <path d="M9 18l6-6-6-6" />
         </svg>
@@ -321,33 +349,26 @@ function DateRangeSelector({ range }: { range: "week" | "month" }) {
 }
 
 function ChartPanel({
-  entries,
+  days,
   target,
   range,
 }: {
-  entries: FoodEntry[];
+  days: DayTotals[];
   target: number | null;
   range: "week" | "month";
 }) {
-  const data = range === "week" ? thisWeek(entries, target) : thisMonth(entries, target);
+  const data = days;
   const weeklyMax = Math.max(...data.map((d) => d.kalori), target ?? 0);
   const chartTop = weeklyMax + 150;
-  const today = new Date().getDay();
-  const mean = data.filter((d) => !d.empty).length
-    ? Math.round(data.filter((d) => !d.empty).reduce((a, d) => a + d.kalori, 0) / data.filter((d) => !d.empty).length)
-    : 0;
+  const maxVal = Math.max(0, ...data.filter((d) => !d.empty && !d.over).map((d) => d.kalori));
   return (
     <div className="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
       <div className="flex items-center justify-between">
-        <h2 className="text-[15px] font-bold text-slate-900">Asupan Kalori</h2>
-        <div className="text-right">
-          <p className="text-lg font-extrabold text-slate-900">{mean.toLocaleString("id-ID")}</p>
-          <p className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">kkal rata-rata</p>
-        </div>
+        <h2 className="text-[15px] font-bold text-slate-900">Grafik Asupan Kalori</h2>
       </div>
       <div className="mt-3 h-52">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} margin={{ top: 8, right: 0, left: 0, bottom: 0 }}>
+          <BarChart data={data} margin={{ top: 8, right: 4, left: 0, bottom: 0 }}>
             <XAxis
               dataKey="label"
               axisLine={false}
@@ -355,7 +376,17 @@ function ChartPanel({
               tick={{ fontSize: 11, fill: "#94a3b8" }}
               interval={range === "month" ? 3 : 0}
             />
-            <YAxis hide domain={[0, chartTop]} />
+            <YAxis
+              width={34}
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 10, fill: "#94a3b8" }}
+              domain={[0, chartTop]}
+              tickCount={4}
+              tickFormatter={(v: number) =>
+                v >= 1000 ? `${(v / 1000).toLocaleString("id-ID")}rb` : String(v)
+              }
+            />
             <Tooltip
               cursor={{ fill: "#f1f5f9" }}
               formatter={(value) => [`${Number(value ?? 0).toLocaleString("id-ID")} kkal`]}
@@ -366,25 +397,21 @@ function ChartPanel({
               <ReferenceLine y={target} stroke="#cbd5e1" strokeDasharray="5 5" strokeWidth={1.5} strokeOpacity={0.9} />
             )}
             <Bar dataKey="kalori" radius={[6, 6, 6, 6]} maxBarSize={range === "week" ? 30 : 12}>
-              {data.map((d, i) => {
-                const isToday =
-                  range === "week" && i === ((today + 6) % 7);
-                return (
-                  <Cell
-                    key={i}
-                    fill={
-                      d.over
-                        ? "#f59e0b"
-                        : isToday
+              {data.map((d, i) => (
+                <Cell
+                  key={i}
+                  fill={
+                    d.empty
+                      ? "#e2e8f0"
+                      : d.over
+                        ? "#F5A623"
+                        : d.kalori === maxVal
                           ? ACCENT
-                          : d.empty
-                            ? "#e2e8f0"
-                            : "#a7d7b5"
-                    }
-                    fillOpacity={d.empty ? 0.5 : 1}
-                  />
-                );
-              })}
+                          : "#a7d7b5"
+                  }
+                  fillOpacity={d.empty ? 0.5 : 1}
+                />
+              ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
@@ -393,8 +420,7 @@ function ChartPanel({
   );
 }
 
-function TargetReachedCard({ entries, range, target }: { entries: FoodEntry[]; range: "week" | "month"; target: number | null }) {
-  const days = range === "week" ? thisWeek(entries, target) : thisMonth(entries, target);
+function TargetReachedCard({ days, target }: { days: DayTotals[]; target: number | null }) {
   const reached = days.filter((d) => d.kalori > 0 && target && d.kalori <= target).length;
   return (
     <div className="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
@@ -403,20 +429,50 @@ function TargetReachedCard({ entries, range, target }: { entries: FoodEntry[]; r
         <span className="font-bold text-[#2E7D32]">{reached} dari {days.length} hari</span> dalam rentang ini
       </p>
       <div className="mt-4 grid grid-cols-7 gap-1.5">
-        {days.map((d, i) => (
-          <div key={i} className="flex flex-col items-center gap-1">
-            <span
-              className={`flex h-9 w-9 items-center justify-center rounded-full text-[13px] font-bold ${
-                d.kalori > 0 && target && d.kalori <= target
-                  ? "bg-emerald-100 text-[#2E7D32]"
-                  : d.kalori > 0
-                    ? "bg-red-100 text-red-500"
-                    : "bg-slate-100 text-slate-400"
-              }`}
-            >
-              {d.kalori > 0 && target && d.kalori <= target ? "✓" : "−"}
-            </span>
-            <span className="text-[9px] font-semibold text-slate-400">{d.label}</span>
+        {days.map((d, i) => {
+          const ok = d.kalori > 0 && target && d.kalori <= target;
+          return (
+            <div key={i} className="flex flex-col items-center gap-1">
+              <span
+                className={`flex h-8 w-8 items-center justify-center rounded-full text-[13px] font-bold ${
+                  ok ? "bg-emerald-100 text-[#2E7D32]" : "text-slate-300"
+                }`}
+              >
+                {ok ? "✓" : "•"}
+              </span>
+              <span className="text-[9px] font-semibold text-slate-400">{d.label}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function SummaryCard({ days, target }: { days: DayTotals[]; target: number | null }) {
+  const filled = days.filter((d) => !d.empty);
+  const mean = filled.length
+    ? Math.round(filled.reduce((a, d) => a + d.kalori, 0) / filled.length)
+    : 0;
+  const reached = days.filter((d) => d.kalori > 0 && target && d.kalori <= target).length;
+  const rows = [
+    { label: "Kalori rata-rata", value: `${mean.toLocaleString("id-ID")} kcal` },
+    { label: "Target rata-rata", value: target ? `${target.toLocaleString("id-ID")} kcal` : "—" },
+    { label: "Hari mencapai target", value: target ? `${reached} hari` : "—" },
+  ];
+  return (
+    <div className="overflow-hidden rounded-3xl border border-slate-200/70 bg-white shadow-sm">
+      <div className="px-5 pt-4">
+        <h2 className="text-[15px] font-bold text-slate-900">Ringkasan</h2>
+      </div>
+      <div className="mt-1">
+        {rows.map((r, i) => (
+          <div
+            key={r.label}
+            className={`flex items-center justify-between px-5 py-3.5 ${i > 0 ? "border-t border-slate-100" : ""} ${i === rows.length - 1 ? "pb-5" : ""}`}
+          >
+            <span className="text-[13px] font-semibold text-slate-600">{r.label}</span>
+            <span className="text-[14px] font-extrabold text-slate-900">{r.value}</span>
           </div>
         ))}
       </div>

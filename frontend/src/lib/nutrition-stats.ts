@@ -1,7 +1,6 @@
 import { FoodEntry } from "@pk/core";
 
 export const MACRO_TARGETS = { carbs: 200, protein: 120, fat: 70 };
-export const MACRO_COLORS = { carbs: "#f59e0b", protein: "#10b981", fat: "#6366f1" };
 
 export const STREAK_MILESTONES = [
   { days: 3, label: "3 hari", reward: "Grafik 7 hari", emoji: "📊" },
@@ -52,9 +51,9 @@ export function consecutiveStreak(days: Set<number>): number {
   return streak;
 }
 
-export function thisWeek(entries: FoodEntry[], target: number | null): DayTotals[] {
+export function thisWeek(entries: FoodEntry[], target: number | null, from: Date = new Date()): DayTotals[] {
   const days: DayTotals[] = [];
-  const now = new Date();
+  const now = new Date(from);
   now.setHours(0, 0, 0, 0);
   const monday = new Date(now);
   const dow = (now.getDay() + 6) % 7;
@@ -81,9 +80,9 @@ export function thisWeek(entries: FoodEntry[], target: number | null): DayTotals
   return days;
 }
 
-export function thisMonth(entries: FoodEntry[], target: number | null): DayTotals[] {
+export function thisMonth(entries: FoodEntry[], target: number | null, from: Date = new Date()): DayTotals[] {
   const days: DayTotals[] = [];
-  const now = new Date();
+  const now = new Date(from);
   const year = now.getFullYear();
   const month = now.getMonth();
   const daysInMonth = new Date(year, month + 1, 0).getDate();

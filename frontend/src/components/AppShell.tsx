@@ -62,10 +62,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
           <Link
             href="/scan"
             aria-label="Tambah makanan"
-            className="flex w-[60px] flex-col items-center gap-0 transition text-[#2E7D32]"
+            className="flex w-[60px] shrink-0 flex-col items-center gap-0 text-[#2E7D32]"
           >
-            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-[#2E7D32] text-white shadow-sm">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+            <span className="flex h-7 w-12 items-center justify-center rounded-full bg-emerald-100">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
                 <path d="M12 5v14M5 12h14" />
               </svg>
             </span>

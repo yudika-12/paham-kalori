@@ -12,9 +12,7 @@ import {
   todayLabel,
   MacroState,
 } from "@/lib/nutrition-stats";
-
-const ACCENT = "#2E7D32";
-const MACRO_CARD_COLORS = { carbs: "#2E7D32", protein: "#2563eb", fat: "#f59e0b" };
+import { MACRO_UI, MACRO_ORDER } from "@/lib/design";
 
 const QUICK_ASKS = [
   "🍽️ Menu makan malam",
@@ -68,7 +66,6 @@ export default function DashboardPage() {
   const [metrics, setMetrics] = useState<Metrics | null>(null);
   const [goal, setGoal] = useState("health");
   const [loading, setLoading] = useState(true);
-  const [profileName, setProfileName] = useState("");
   const [profileId, setProfileId] = useState<string | null>(null);
   const [macroOpen, setMacroOpen] = useState(false);
   const fetchedRef = useRef(false);
@@ -94,7 +91,6 @@ export default function DashboardPage() {
       const m = await metricsRes.json();
       if (Array.isArray(food.entries)) setEntries(food.entries);
       if (m.metrics) setMetrics(m.metrics);
-      if (profile.name) setProfileName(profile.name);
       if (profile.goal) setGoal(profile.goal);
     } catch {
       /* noop */
@@ -168,32 +164,51 @@ export default function DashboardPage() {
   return (
     <AppShell>
       <main className="px-4 pt-5 md:px-6">
-        <Header name={profileName} alerts={alerts} />
+        <Header alerts={alerts} />
 
-        <section className="mt-4 rounded-3xl border border-slate-200/70 bg-white p-5 shadow-[0_10px_30px_rgba(46,125,50,0.10)]">
-          <div className="flex items-center justify-between">
-            <h2 className="text-[13px] font-bold text-slate-900">Kalori Hari Ini</h2>
-            <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${pct >= 100 ? "bg-amber-100 text-amber-700" : "bg-emerald-100 text-emerald-700"}`}>
-              {pct}%
+        <section className="mt-4 rounded-3xl bg-gradient-to-br from-[#2FA96B] via-[#2C9B66] to-[#2E8B5C] p-4 text-white shadow-[0_8px_24px_rgba(46,125,50,0.16)]">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="text-[12px] font-bold text-white/90">Kalori Hari Ini</h2>
+              <div className="mt-1.5 flex items-baseline gap-1">
+                <span className="text-3xl font-extrabold leading-none tracking-tight">
+                  {target ? todayCalories.toLocaleString("id-ID") : "—"}
+                </span>
+                {target ? (
+                  <span className="text-xs font-semibold text-white/80">kcal</span>
+                ) : null}
+              </div>
+              <p className="mt-1 text-[11px] font-medium text-white/70">
+                {target
+                  ? `dari ${target.toLocaleString("id-ID")} kcal`
+                  : "Lengkapi data tubuh untuk menghitung target"}
+              </p>
+            </div>
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 ring-1 ring-white/15">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-white">
+                <path d="M3 3v18h18" />
+                <path d="M7 15v-3M12 15V8M17 15v-6" />
+              </svg>
             </span>
           </div>
 
-          <div className="mt-3 flex items-center justify-between gap-4">
-            <div className="flex-1">
-              <CalorieRing consumed={todayCalories} target={target} />
-            </div>
-            <div className="flex flex-1 flex-col items-start gap-3">
-              <StatBlock
-                label="Terpakai"
-                value={target ? todayCalories.toLocaleString("id-ID") : "—"}
-              />
-              <StatBlock
-                label="Sisa"
-                value={remaining != null ? Math.abs(remaining).toLocaleString("id-ID") : "—"}
-                unit={remaining != null && remaining < 0 ? "kkal lewat" : "kkal"}
-                color={remaining != null && remaining < 0 ? "#dc2626" : "#2E7D32"}
+          <div className="mt-3 flex items-center gap-2">
+            <div className="h-1 flex-1 overflow-hidden rounded-full bg-white/20">
+              <div
+                className="h-full rounded-full bg-white transition-all duration-500"
+                style={{ width: `${pct}%` }}
               />
             </div>
+            <span className="w-9 shrink-0 text-right text-[11px] font-bold text-white">{pct}%</span>
+          </div>
+
+          <div className="mt-2.5 flex items-center justify-between border-t border-white/15 pt-2.5">
+            <span className="text-[11px] font-semibold text-white/75">Sisa</span>
+            <span className="text-[13px] font-extrabold">
+              {remaining != null
+                ? `${remaining < 0 ? "−" : ""}${Math.abs(remaining).toLocaleString("id-ID")} kcal`
+                : "—"}
+            </span>
           </div>
         </section>
 
@@ -218,10 +233,17 @@ export default function DashboardPage() {
               </svg>
             </span>
           </button>
-          <div className="mt-3 grid grid-cols-3 gap-2.5">
-            <MacroCard label="Karbohidrat" grams={macros.carbs} target={MACRO_TARGETS.carbs} color={MACRO_CARD_COLORS.carbs} />
-            <MacroCard label="Protein" grams={macros.protein} target={MACRO_TARGETS.protein} color={MACRO_CARD_COLORS.protein} />
-            <MacroCard label="Lemak" grams={macros.fat} target={MACRO_TARGETS.fat} color={MACRO_CARD_COLORS.fat} />
+          <div className="mt-3 space-y-2.5">
+            {MACRO_ORDER.map((key) => (
+              <MacroCard
+                key={key}
+                kind={key}
+                label={MACRO_UI[key].label}
+                grams={macros[key]}
+                target={MACRO_TARGETS[key]}
+                color={MACRO_UI[key].color}
+              />
+            ))}
           </div>
           {macroOpen && (
             <div className="mt-3 border-t border-slate-100 pt-4 anim-notif-in" key="micro">
@@ -254,14 +276,24 @@ export default function DashboardPage() {
           </div>
           <div className="mt-3 space-y-2.5">
             {todayEntries.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-slate-200 bg-white p-5 text-center">
-                <p className="text-3xl">🍽️</p>
-                <p className="mt-2 text-[13px] font-semibold text-slate-600">Belum ada catatan hari ini</p>
+              <div className="rounded-2xl border border-slate-200/70 bg-white p-6 text-center">
+                <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-100">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="h-8 w-8">
+                    <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+                    <path d="M7 2v20" />
+                    <path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7" />
+                  </svg>
+                </span>
+                <p className="mt-3 text-[14px] font-bold text-slate-700">Belum ada catatan makanan</p>
+                <p className="mt-1 text-[12px] text-slate-400">Yuk, catat makanan pertama Anda</p>
                 <Link
                   href="/scan"
-                  className="mt-3 inline-flex items-center justify-center rounded-xl bg-[#2E7D32] px-5 py-2.5 text-[13px] font-bold text-white shadow-md shadow-emerald-700/20 transition hover:bg-emerald-700"
+                  className="mt-4 inline-flex items-center justify-center gap-1.5 rounded-2xl bg-[#2E7D32] px-6 py-3 text-[13px] font-bold text-white shadow-lg shadow-emerald-700/25 transition hover:bg-emerald-700"
                 >
-                  + Catat Makanan
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                    <path d="M12 5v14M5 12h14" />
+                  </svg>
+                  Catat Makanan
                 </Link>
               </div>
             ) : (
@@ -279,10 +311,8 @@ export default function DashboardPage() {
 }
 
 function Header({
-  name,
   alerts,
 }: {
-  name: string;
   alerts: { title: string; suggestions: string[] }[];
 }) {
   const [open, setOpen] = useState(false);
@@ -290,10 +320,8 @@ function Header({
     <div className="relative mb-2">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
-            Halo{name ? `, ${name}` : ""} 👋
-          </h1>
-          <p className="mt-0.5 text-xs text-slate-400">{todayLabel()}</p>
+          <h1 className="text-[26px] font-extrabold tracking-tight text-slate-900">Dashboard</h1>
+          <p className="mt-0.5 text-[13px] font-medium text-slate-400">{todayLabel()}</p>
         </div>
         <button
           onClick={() => setOpen((o) => !o)}
@@ -305,9 +333,7 @@ function Header({
             <path d="M13.7 21a2 2 0 0 1-3.4 0" />
           </svg>
           {alerts.length > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
-              {alerts.length}
-            </span>
+            <span className="absolute right-1.5 top-1.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white" />
           )}
         </button>
       </div>
@@ -372,59 +398,56 @@ function Header({
   );
 }
 
-function StatBlock({ label, value, unit, color = "#0f172a" }: { label: string; value: string; unit?: string; color?: string }) {
+function macroGlyph(kind: "carbs" | "protein" | "fat") {
   return (
-    <div className="w-full rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-100">
-      <p className="text-[11px] font-semibold text-slate-500">{label}</p>
-      <p className="mt-0.5 text-2xl font-extrabold" style={{ color }}>
-        {value}
-        {unit ? <span className="ml-1 text-[11px] font-semibold text-slate-400">{unit}</span> : null}
-      </p>
-    </div>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+      {kind === "carbs" ? (
+        <>
+          <path d="M2 22 16 8" />
+          <path d="M17.5 8 16 9.5 14.5 8" />
+          <path d="M20.5 5 19 6.5 17.5 5" />
+          <path d="M20.5 11l-1.5 1.5-1.5-1.5" />
+          <path d="M12 6l-1.5 1.5L9 6" />
+          <path d="M12 12l-1.5 1.5L9 12" />
+        </>
+      ) : kind === "protein" ? (
+        <>
+          <path d="M6.5 3h11C18.5 5 19 7.5 19 10.5c0 4.5-3.1 8.5-7 8.5s-7-4-7-8.5C5 7.5 5.5 5 6.5 3Z" />
+          <path d="M9 8.5c.5 1.2 1.5 2 2.5 2.2" />
+        </>
+      ) : (
+        <path d="M12 2.7S6 9 6 14a6 6 0 0 0 12 0c0-5-6-11.3-6-11.3Z" />
+      )}
+    </svg>
   );
 }
 
-function CalorieRing({ consumed, target }: { consumed: number; target: number | null }) {
-  const r = 50;
-  const c = 2 * Math.PI * r;
-  const filled = target ? (consumed / target) * c : 0;
-  const over = target ? consumed > target : false;
-  return (
-    <div className="relative h-40 w-40">
-      <svg viewBox="0 0 128 128" className="h-full w-full -rotate-90">
-        <circle cx="64" cy="64" r={r} fill="none" stroke="#eef2f0" strokeWidth="11" />
-        <circle
-          cx="64"
-          cy="64"
-          r={r}
-          fill="none"
-          stroke={over ? "#f59e0b" : ACCENT}
-          strokeWidth="11"
-          strokeLinecap="round"
-          strokeDasharray={c}
-          strokeDashoffset={Math.max(0, c - filled)}
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-        <span className="text-[11px] font-semibold text-slate-400">Terpakai</span>
-        <span className="text-2xl font-extrabold text-slate-900">{target ? consumed.toLocaleString("id-ID") : "—"}</span>
-        <span className="text-[11px] text-slate-400">{target ? `dari ${target.toLocaleString("id-ID")} kkal` : "kkal"}</span>
-      </div>
-    </div>
-  );
-}
-
-function MacroCard({ label, grams, target, color }: { label: string; grams: number; target: number; color: string }) {
+function MacroCard({ kind, label, grams, target, color }: { kind: "carbs" | "protein" | "fat"; label: string; grams: number; target: number; color: string }) {
   const pct = Math.min(100, (grams / target) * 100);
   return (
-    <div className="rounded-2xl border border-slate-200/70 bg-white p-3 shadow-sm">
-      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{label}</p>
-      <p className="mt-1 text-xl font-extrabold text-slate-900">
-        {grams.toLocaleString("id-ID")}
-        <span className="ml-0.5 text-[11px] font-semibold text-slate-400">g</span>
-      </p>
-      <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
-        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: color }} />
+    <div className="flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-white p-3.5 shadow-sm">
+      <span
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white"
+        style={{ background: color }}
+      >
+        {macroGlyph(kind)}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="text-[13px] font-bold text-slate-800">{label}</p>
+        <p className="mt-0.5 text-[12px] font-semibold text-slate-400">
+          {grams.toLocaleString("id-ID")} g
+        </p>
+      </div>
+      <div className="flex w-[42%] shrink-0 items-center gap-2">
+        <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
+          <div
+            className="h-full rounded-full transition-all"
+            style={{ width: `${pct}%`, background: color }}
+          />
+        </div>
+        <span className="w-9 shrink-0 text-right text-[11px] font-bold text-slate-600">
+          {Math.round(pct)}%
+        </span>
       </div>
     </div>
   );
