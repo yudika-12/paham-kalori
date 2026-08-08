@@ -551,8 +551,9 @@ function CoachFloating({ profileId }: { profileId: string | null }) {
       )}
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/20 backdrop-blur-sm sm:items-end sm:justify-end sm:pr-6 sm:pb-6">
-          <div className="flex h-[82dvh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 sm:h-[min(600px,80dvh)] sm:rounded-3xl anim-notif-in">
+        <>
+          <div className="fixed inset-0 z-40 bg-slate-900/20 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
+          <aside className="fixed right-0 top-0 z-50 flex h-dvh w-[min(23rem,100vw)] flex-col border-l border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-900 anim-chat-side-in">
             <div className="flex items-center gap-2.5 border-b border-slate-100 px-4 py-3 dark:border-slate-800">
               <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-[#2E7D32] text-white">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
@@ -633,8 +634,8 @@ function CoachFloating({ profileId }: { profileId: string | null }) {
                 </button>
               </form>
             </div>
-          </div>
-        </div>
+          </aside>
+        </>
       )}
     </>
   );

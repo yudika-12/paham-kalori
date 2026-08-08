@@ -41,6 +41,19 @@ body {
   animation: notifIn 0.25s ease-out;
 }
 
+@keyframes chatSideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.anim-chat-side-in {
+  animation: chatSideIn 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 @keyframes float {
   0%,
   100% {
