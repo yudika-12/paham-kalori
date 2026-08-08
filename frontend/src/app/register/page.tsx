@@ -41,9 +41,9 @@ const goalOptions: { value: Goal; label: string; emoji: string }[] = [
 ];
 
 const fieldClasses =
-  "h-12 w-full rounded-xl border border-slate-200 bg-white text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-white/10 dark:bg-[#0E1114] dark:text-white dark:placeholder:text-slate-500 dark:focus:border-emerald-400 dark:focus:ring-emerald-400/10";
+  "h-11 w-full rounded-xl border border-slate-200 bg-white text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-white/10 dark:bg-[#0E1114] dark:text-white dark:placeholder:text-slate-500 dark:focus:border-emerald-400 dark:focus:ring-emerald-400/10";
 
-const labelClasses = "mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-300";
+const labelClasses = "mb-1.5 block text-[13px] font-semibold text-slate-700 dark:text-slate-300";
 
 function FieldIcon({ children }: { children: React.ReactNode }) {
   return (
@@ -351,10 +351,10 @@ export default function RegisterPage() {
       <main className="relative z-10 flex flex-1 items-center justify-center px-6 pb-10 pt-6">
         <div className="w-full max-w-lg">
           <div className="mb-5 text-center">
-            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            <h1 className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Daftar
             </h1>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+            <p className="mt-1.5 text-[13px] text-slate-500 dark:text-slate-400">
               Buat akun &amp; mulai sekarang.
             </p>
           </div>
@@ -393,11 +393,11 @@ export default function RegisterPage() {
             })}
           </div>
 
-          <div className="rounded-3xl bg-white p-6 shadow-xl shadow-slate-200/60 ring-1 ring-slate-100 dark:border dark:border-white/10 dark:bg-[#161B20] dark:shadow-2xl dark:shadow-black/40">
+          <div className="rounded-2xl bg-white p-5 shadow-xl shadow-slate-200/60 ring-1 ring-slate-100 dark:border dark:border-white/10 dark:bg-[#161B20] dark:shadow-2xl dark:shadow-black/40">
             {step === 0 && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">Buat akunmu.</h2>
+                  <h2 className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white">Buat akunmu.</h2>
                   <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Nama, email, dan password untuk login.</p>
                 </div>
 
@@ -484,12 +484,12 @@ export default function RegisterPage() {
             {step === 1 && (
               <div className="space-y-4">
                 <div>
-                  <h2 className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">Data dirimu.</h2>
+                  <h2 className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white">Data dirimu.</h2>
                   <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Biar target kalorimu akurat.</p>
                 </div>
 
                 <div>
-                  <p className="mb-2 text-sm font-semibold text-slate-700 dark:text-slate-300">Tingkat aktivitas</p>
+                  <p className="mb-2 text-[13px] font-semibold text-slate-700 dark:text-slate-300">Tingkat aktivitas</p>
                   <div className="grid grid-cols-2 gap-2.5">
                     {activityOptions.map((opt) => {
                       const selected = activityLevel === opt.value;
@@ -602,7 +602,7 @@ export default function RegisterPage() {
             {step === 2 && (
               <div className="space-y-4">
                 <div>
-                  <h2 className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">Apa tujuan utamamu?</h2>
+                  <h2 className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white">Apa tujuan utamamu?</h2>
                   <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Kami sesuaikan target kalori harian dengan tujuan ini.</p>
                 </div>
                 <div className="space-y-2">
@@ -665,7 +665,7 @@ export default function RegisterPage() {
                 <button
                   onClick={goNext}
                   disabled={!canNext}
-                  className="w-full rounded-2xl bg-emerald-500 py-4 text-base font-bold text-white shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-emerald-400"
+                  className="w-full rounded-xl bg-emerald-500 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-600 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 dark:hover:bg-emerald-400"
                 >
                   Lanjut
                 </button>
@@ -673,7 +673,7 @@ export default function RegisterPage() {
                 <button
                   onClick={handleSubmit}
                   disabled={loading}
-                  className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500 py-4 text-base font-bold text-white shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-600 active:scale-[0.99] disabled:opacity-50 dark:hover:bg-emerald-400"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-600 active:scale-[0.99] disabled:opacity-50 dark:hover:bg-emerald-400"
                 >
                   {loading ? "Mendaftar..." : "Daftar ✨"}
                 </button>

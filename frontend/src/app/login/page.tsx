@@ -7,7 +7,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 const fieldClasses =
-  "w-full rounded-xl border border-slate-200 bg-white py-3.5 pl-11 pr-11 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-white/10 dark:bg-[#0E1114] dark:text-white dark:placeholder:text-slate-500 dark:focus:border-emerald-400 dark:focus:ring-emerald-400/10";
+  "w-full rounded-xl border border-slate-200 bg-white py-3 pl-11 pr-11 text-sm text-slate-900 placeholder:text-slate-400 outline-none transition focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 dark:border-white/10 dark:bg-[#0E1114] dark:text-white dark:placeholder:text-slate-500 dark:focus:border-emerald-400 dark:focus:ring-emerald-400/10";
 
 const fieldErrorClasses =
   "border-red-500/70 bg-red-50 focus:border-red-500 focus:ring-4 focus:ring-red-500/10 dark:bg-red-950/20 dark:focus:border-red-400 dark:focus:ring-red-500/10";
@@ -126,9 +126,9 @@ function LoginForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+        <label className="mb-1 block text-[13px] font-semibold text-slate-700 dark:text-slate-300">
           Alamat Email
         </label>
         <div className="relative">
@@ -154,7 +154,7 @@ function LoginForm() {
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+        <label className="mb-1 block text-[13px] font-semibold text-slate-700 dark:text-slate-300">
           Password
         </label>
         <div className="relative">
@@ -196,12 +196,12 @@ function LoginForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-2xl bg-emerald-500 py-4 text-base font-extrabold tracking-wide text-white shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-600 active:scale-[0.99] disabled:opacity-60 dark:hover:bg-emerald-400"
+        className="w-full rounded-xl bg-emerald-500 py-3 text-sm font-extrabold tracking-wide text-white shadow-lg shadow-emerald-500/30 transition hover:bg-emerald-600 active:scale-[0.99] disabled:opacity-60 dark:hover:bg-emerald-400"
       >
         {loading ? "Memeriksa..." : "MASUK SEKARANG"}
       </button>
 
-      <p className="text-center text-sm text-slate-500 dark:text-slate-400">
+      <p className="text-center text-[13px] text-slate-500 dark:text-slate-400">
         Belum punya akun?{" "}
         <Link href="/register" className="font-bold text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 dark:hover:text-emerald-300">
           Daftar gratis
@@ -241,23 +241,23 @@ export default function LoginPage() {
       </header>
 
       <main className="relative z-10 flex flex-1 items-center justify-center px-6 pb-16 pt-6">
-        <div className="w-full max-w-md">
-          <div className="mb-8 text-center">
-                        <h1 className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+        <div className="w-full max-w-sm">
+          <div className="mb-5 text-center">
+            <h1 className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Masuk
             </h1>
-            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+            <p className="mt-1.5 text-[13px] text-slate-500 dark:text-slate-400">
               Lanjutkan perjalananmu.
             </p>
           </div>
 
-          <div className="rounded-3xl bg-white p-8 shadow-xl shadow-slate-200/60 ring-1 ring-slate-100 dark:border dark:border-white/10 dark:bg-[#161B20] dark:shadow-2xl dark:shadow-black/40">
+          <div className="rounded-2xl bg-white p-6 shadow-xl shadow-slate-200/60 ring-1 ring-slate-100 dark:border dark:border-white/10 dark:bg-[#161B20] dark:shadow-2xl dark:shadow-black/40">
             <Suspense>
               <LoginForm />
             </Suspense>
           </div>
 
-          <p className="mt-6 text-center text-xs text-slate-400 dark:text-slate-500">
+          <p className="mt-5 text-center text-[11px] text-slate-400 dark:text-slate-500">
             Paham Kalori — bukan pengganti nasihat medis.
           </p>
         </div>
