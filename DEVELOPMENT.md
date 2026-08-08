@@ -12,31 +12,31 @@ This document covers the project **structure**, **technology stack**, **architec
 | **Auth** | NextAuth v5 (beta) on the client, custom JWT (HS256 via `jose`) + bcrypt on the server |
 | **AI** | Google **Gemini** (`@google/generative-ai`) for food recognition, calorie/nutrition estimates & chat (Server-Sent Events) |
 | **Shared code** | `@pk/core` workspace package (entities, constants, error types) |
-| **Build / Deploy** | Vercel — satu proyek `paham-kalori` (Next.js); `/api/*` ditangani langsung di dalam proyek yang sama |
+| **Build / Deploy** | Vercel — single project `paham-kalori` (Next.js); `/api/*` is handled in-process in the same project |
 
 ## Monorepo Structure
 
 ```text
 paham-kalori/
-├── frontend/            # Satu-satunya app (UI Next.js + API Hono via route handlers)
+├── frontend/            # Only app (Next.js UI + Hono API via route handlers)
 │   ├── src/
 │   │   ├── app/         # App Router: login, register, scan, dashboard, history, chat, profil
 │   │   │   └── api/     # Route handlers:
 │   │   │       ├── auth/[...nextauth]/   NextAuth (session/callback)
-│   │   │       ├── auth/login|check-email  override Hono auth endpoints
-│   │   │       ├── [...path]/            catch-all → Hono (onboarding, food, metrics, chat, dll)
+│   │   │       ├── auth/login|check-email  Hono auth endpoint overrides
+│   │   │       ├── [...path]/            catch-all → Hono (onboarding, food, metrics, dashboard, chat, etc.)
 │   │   │       └── health/               health check
-│   │   ├── server/      # source Hono backend (migrasi dari `backend/`):
+│   │   ├── server/      # Hono backend source:
 │   │   │   ├── app.ts         # Hono app, CORS, route mounting
-│   │   │   ├── ai/gemini.ts   # wrapper Gemini (SSE chat / image)
+│   │   │   ├── ai/gemini.ts   # Gemini wrapper (SSE chat / image)
 │   │   │   ├── auth/jwt.ts    # HS256 sign/verify
 │   │   │   ├── db/prisma.ts   # Prisma client + Neon adapter
 │   │   │   ├── middleware/    # auth, require-profile guards
-│   │   │   ├── routes/        # auth, register, onboarding, food, metrics, chat, nutrition
+│   │   │   ├── routes/        # auth, register, onboarding, food, metrics, dashboard, chat, nutrition
 │   │   │   ├── services/      # business logic (auth, metric, nutrition, chat)
 │   │   │   └── repositories/  # data access (user, profile, food, chat)
 │   │   ├── data/auth/         # NextAuth config
-│   │   └── lib/               # client hooks, image helpers, nutrition-stats, profile-local
+│   │   └── lib/               # client hooks, api-cache, image helpers, nutrition-stats, profile-local
 │   ├── prisma/
 │   │   ├── schema.prisma      # models: User, Profile, FoodEntry, Chat
 │   │   └── prisma.config.ts   # Prisma CLI config (schema + datasource)
@@ -53,9 +53,9 @@ paham-kalori/
 
 | Project | URL | Root | Purpose |
 |---|---|---|---|
-| `paham-kalori` | `https://paham-kalori.vercel.app` | frontend | Satu-satunya proyek: UI + API (Hono route handlers) |
+| `paham-kalori` | `https://paham-kalori.vercel.app` | frontend | Single project: UI + API (Hono route handlers) |
 
-Tidak ada proyek backend terpisah. `@pk/core` workspace diinstal dari monorepo; Prisma Client di-generate saat build.
+There is no separate backend project. The `@pk/core` workspace is installed from the monorepo; the Prisma Client is generated at build time.
 
 ## Architecture & Workflow
 
@@ -69,14 +69,23 @@ Tidak ada proyek backend terpisah. `@pk/core` workspace diinstal dari monorepo; 
         |  Route handlers /api/* → Hono (in-process) |
         |    ├─ auth / register                       |
         |    ├─ onboarding / food / metrics           |
+        |    ├─ dashboard (combined: food+metrics)    |
         |    ├─ chat (SSE stream)                     |
         |    └─ nutrition/analyze                     |
         |  Api call → Prisma → Neon PostgreSQL        |
-        |             → Gemini (analisis makanan/chat)|
+        |             → Gemini (food analysis/chat)   |
         +-------------------------------------------+
 ```
 
 The browser only ever talks to the single origin. `/api/*` requests are handled by route handlers that mount the Hono app in-process — **no external hop**, so only one serverless function per request (instead of frontend→API twice).
+
+### Client-side data cache
+
+To keep page-to-page navigation fast, the pages call a shared cache helper (`src/lib/client/api-cache.ts`) that memoizes GET responses for 60 seconds:
+
+- **Dashboard** & **Statistics** fetch everything in **one** request to `GET /api/dashboard?profileId=…&from=…&to=…`, which returns `{ entries, metrics, goal }`.
+- **Profile** fetches `/api/metrics` through the same cache.
+- The cache is invalidated whenever data changes (scan save/edit, history delete/edit) so dashboards never show stale numbers.
 
 ### Request flow (food scan example)
 
@@ -97,11 +106,11 @@ Browser │            Next.js (route handler → Hono)        │   Neon / Gemi
 ### Local development
 ```bash
 npm install            # install workspace (frontend + shared)
-npm run dev            # next dev (frontend) — Hono API aktif via route handlers
+npm run dev            # next dev (frontend) — Hono API active via route handlers
 ```
-- Hanya butuh env `frontend` dibaca Next dari `frontend/.env.local` (untuk lokal, isi atau symlink dari root `.env`):
+- Only the `frontend` env is needed; Next reads `frontend/.env.local` (for local dev, fill it in or symlink it from the root `.env`):
   - `DATABASE_URL`, `AUTH_SECRET`, `AUTH_TRUST_HOST`, `GEMINI_API_KEY`, `GEMINI_MODEL`, `FRONTEND_URL`.
-- Tidak perlu server Hono terpisah di port 4000 lagi.
+- No separate Hono server on port 4000 anymore.
 
 ### Database schema sync
 ```bash
@@ -114,9 +123,9 @@ npm run build          # prisma generate && next build
 npm run lint           # eslint + tsc --noEmit (frontend)
 ```
 
-### Deploy ke Vercel (single project)
+### Deploy to Vercel (single project)
 ```bash
-npx vercel --prod --yes --scope acme-22b3     # dari repo root (Root Directory project = frontend)
+npx vercel --prod --yes --scope acme-22b3     # run from repo root (project Root Directory = frontend)
 ```
 
 ### End-to-end verification
@@ -133,10 +142,10 @@ curl .../api/food                                                   # → 401 ta
 | `DATABASE_URL` | frontend → Prisma ↔ Neon | `postgresql://user:pass@host.neon.tech/db?sslmode=require` |
 | `AUTH_SECRET` | NextAuth + JWT signing | 64-char hex |
 | `GEMINI_API_KEY` | Gemini calls (primary) | `AIza...` |
-| `GEMINI_API_KEY_2` | (optional) cadangan — dipakai otomatis bila key 1 kena kuota/429 | `AIza...` |
+| `GEMINI_API_KEY_2` | (optional) fallback — used automatically when key 1 hits quota/429 | `AIza...` |
 | `GEMINI_MODEL` | Gemini model id | `gemini-flash-latest` |
-| `FRONTEND_URL` | CORS header (harmless kini) | `https://paham-kalori.vercel.app` |
+| `FRONTEND_URL` | CORS header (harmless now) | `https://paham-kalori.vercel.app` |
 | `AUTH_TRUST_HOST` | NextAuth behind Vercel | `true` |
 | `PORT` | (optional) local server | `4000` |
 
-> `BACKEND_URL` tidak dipakai lagi — sudah dihapus dari rewrite & NextAuth (login via service in-process).
+> `BACKEND_URL` is no longer used — removed from the rewrite & NextAuth (login goes through the in-process service).

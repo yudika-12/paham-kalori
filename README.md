@@ -9,6 +9,7 @@
 | 📈 **History + chart** | Daily timeline log you can edit/delete + weekly/monthly calorie chart with target line & achievement grade |
 | 💬 **AI Coach "Buddy"** | Floating chat for questions about meals, exercise, and healthy habits |
 | 👤 **Profile** | Manage your personal data, goals & health metrics |
+| ⚡ **Fast navigation** | Combined `/api/dashboard` endpoint + client-side data cache make switching between Dashboard, Statistics and Profile feel instant |
 
 ## 🌐 Open the app
 
@@ -38,3 +39,4 @@ Open **[paham-kalori.vercel.app](https://paham-kalori.vercel.app)** in any brows
 - **AI:** Gemini for food recognition, calorie/nutrition estimates & chat responses (Server-Sent Events)
 - **Auth:** NextAuth with a custom login/register API
 - **Deploy:** Single Vercel project — [paham-kalori.vercel.app](https://paham-kalori.vercel.app) (Hono API runs as Next.js route handlers, no separate backend)
+- **Perf:** Combined `/api/dashboard` endpoint (food + metrics + goal in one request) + a shared client-side cache (60s TTL, invalidated on saves/edits/deletes) for snappy page-to-page navigation

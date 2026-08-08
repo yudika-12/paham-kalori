@@ -186,9 +186,6 @@ export default function HistoryPage() {
               <div className="pt-1">
                 <div className="flex items-center justify-between">
                   <h2 className="text-[14px] font-bold text-slate-900">Log Harian</h2>
-                  <Link href="/scan" className="text-[12px] font-bold text-[#2E7D32]">
-                    + Catat
-                  </Link>
                 </div>
 
                 <div className="mt-4 space-y-8">
