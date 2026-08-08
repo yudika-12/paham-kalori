@@ -345,14 +345,14 @@ function Header({
       )}
       {open && alerts.length > 0 && (
         <div className="absolute right-0 top-14 z-40 w-[calc(100vw-2rem)] max-w-sm rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10 anim-notif-in">
-          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+          <div className="flex items-center justify-between border-b border-slate-100 px-3.5 py-2.5">
             <p className="flex items-center gap-2 text-sm font-bold text-slate-900">
               <span className="relative flex h-2.5 w-2.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-red-500" />
               </span>
               Notifikasi
-              <span className="rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-bold text-red-600">{alerts.length}</span>
+              <span className="rounded-full bg-red-100 px-1.5 py-0.5 text-[10px] font-bold text-red-600">{alerts.length}</span>
             </p>
             <button
               onClick={() => setOpen(false)}
@@ -365,20 +365,20 @@ function Header({
             </button>
           </div>
 
-          <div className="max-h-80 space-y-3 overflow-y-auto px-4 py-3">
+          <div className="max-h-80 space-y-2 overflow-y-auto px-3 py-2.5">
             {alerts.map((a) => (
               <div
                 key={a.title}
-                className="rounded-2xl border border-slate-100 bg-slate-50/60 p-3.5"
+                className="rounded-xl border border-slate-100 bg-slate-50/60 p-3"
               >
                 <p className="text-[13px] font-bold leading-snug text-slate-900">
                   <span className="mr-1.5">💡</span>
                   {a.title}
                 </p>
-                <p className="mt-2 text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                <p className="mt-1.5 text-[10px] font-bold uppercase tracking-wide text-slate-400">
                   Bisa coba:
                 </p>
-                <ul className="mt-1.5 space-y-1.5">
+                <ul className="mt-1 space-y-1">
                   {a.suggestions.map((s) => (
                     <li key={s} className="flex items-start gap-2 text-[13px] leading-snug text-slate-600">
                       <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[10px] font-bold text-emerald-700">

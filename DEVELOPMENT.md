@@ -132,7 +132,8 @@ curl .../api/food                                                   # → 401 ta
 |---|---|---|
 | `DATABASE_URL` | frontend → Prisma ↔ Neon | `postgresql://user:pass@host.neon.tech/db?sslmode=require` |
 | `AUTH_SECRET` | NextAuth + JWT signing | 64-char hex |
-| `GEMINI_API_KEY` | Gemini calls | `AIza...` |
+| `GEMINI_API_KEY` | Gemini calls (primary) | `AIza...` |
+| `GEMINI_API_KEY_2` | (optional) cadangan — dipakai otomatis bila key 1 kena kuota/429 | `AIza...` |
 | `GEMINI_MODEL` | Gemini model id | `gemini-flash-latest` |
 | `FRONTEND_URL` | CORS header (harmless kini) | `https://paham-kalori.vercel.app` |
 | `AUTH_TRUST_HOST` | NextAuth behind Vercel | `true` |

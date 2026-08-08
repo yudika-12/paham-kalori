@@ -38,14 +38,15 @@ export class NutritionService {
     const img = NutritionService.extractImage(imageDataUrl);
     if (!img) throw new BadRequestError("Format foto tidak valid.");
 
-    const model = this.gemini.generative({ temperature: 0.2 });
     const prompt = this.gemini.buildFoodPrompt(profile.toInput());
     let result;
     try {
-      result = await model.generateContent([
-        prompt,
-        { inlineData: { mimeType: img.mimeType, data: img.data } },
-      ]);
+      result = await this.gemini.run((m) =>
+        m.generative({ temperature: 0.2 }).generateContent([
+          prompt,
+          { inlineData: { mimeType: img.mimeType, data: img.data } },
+        ])
+      );
     } catch (e) {
       throw NutritionService.toAppError(e, "Gagal menganalisis makanan.");
     }
@@ -116,11 +117,10 @@ export class NutritionService {
     const cleaned = name.trim();
     if (!cleaned) throw new BadRequestError("Nama makanan wajib diisi.");
 
-    const model = this.gemini.generative({ temperature: 0.2 });
     const prompt = this.gemini.buildFoodNamePrompt(profile.toInput(), cleaned);
     let result;
     try {
-      result = await model.generateContent(prompt);
+      result = await this.gemini.run((m) => m.generative({ temperature: 0.2 }).generateContent(prompt));
     } catch (e) {
       throw NutritionService.toAppError(e, "Gagal memperbarui perkiraan kalori.");
     }
@@ -174,11 +174,12 @@ export class NutritionService {
       `Makanan: ${entries.map((e) => `${e.name} (${e.calories} kkal)`).join(", ")}`,
     ].join("\n");
 
-    const model = this.gemini.generative({ temperature: 0.7, json: false });
     const prompt = this.gemini.buildNutritionAnalysisPrompt(profile.toInput(), summary);
     let result;
     try {
-      result = await model.generateContent(prompt);
+      result = await this.gemini.run((m) =>
+        m.generative({ temperature: 0.7, json: false }).generateContent(prompt)
+      );
     } catch (e) {
       throw NutritionService.toAppError(e, "Gagal menganalisis makronutrien.");
     }

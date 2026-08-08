@@ -14,7 +14,7 @@ const fieldErrorClasses =
 
 function AlertIcon() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 h-5 w-5 shrink-0">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 shrink-0">
       <circle cx="12" cy="12" r="10" />
       <path d="M12 8v4" />
       <path d="M12 16h.01" />
@@ -183,13 +183,10 @@ function LoginForm() {
       {error && (
         <div
           role="alert"
-          className="anim-notif-in flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-600 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300"
+          className="anim-notif-in flex items-center gap-2.5 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-[13px] text-red-600 dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-300"
         >
           <AlertIcon />
-          <div className="flex-1">
-            <p className="font-extrabold">Gagal Masuk</p>
-            <p className="mt-0.5 leading-snug">{error}</p>
-          </div>
+          <p className="flex-1 leading-snug">{error}</p>
         </div>
       )}
 

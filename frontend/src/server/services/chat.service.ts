@@ -36,17 +36,18 @@ export class ChatService {
 
     const history = await this.buildHistory(profile.id);
 
-    const model = this.gemini.generative({
-      systemInstruction: this.gemini.buildChatInstruction(profile.toInput(), todaySummary),
-      json: false,
-      temperature: 0.8,
-      maxOutputTokens: 500,
-    });
-    const chat = model.startChat({ history });
-
     let stream;
     try {
-      stream = await chat.sendMessageStream(message);
+      stream = await this.gemini.run(async (m) => {
+        const model = m.generative({
+          systemInstruction: this.gemini.buildChatInstruction(profile.toInput(), todaySummary),
+          json: false,
+          temperature: 0.8,
+          maxOutputTokens: 500,
+        });
+        const chat = model.startChat({ history });
+        return chat.sendMessageStream(message);
+      });
     } catch (e) {
       console.error("Chat sendMessageStream error:", this.gemini.errorMessage(e));
       const status = (e as { status?: number }).status;

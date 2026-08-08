@@ -10,15 +10,33 @@ export interface GeminiModelOptions {
   maxOutputTokens?: number;
 }
 
-export class GeminiModel {
-  private readonly client: GoogleGenerativeAI;
+function collectApiKeys(): string[] {
+  const keys: string[] = [];
+  const primary = process.env.GEMINI_API_KEY;
+  if (primary) keys.push(primary);
+  for (let i = 2; i <= 3; i++) {
+    const k = process.env[`GEMINI_API_KEY_${i}`];
+    if (k) keys.push(k);
+  }
+  return keys;
+}
 
-  constructor(apiKey = process.env.GEMINI_API_KEY || "") {
-    this.client = new GoogleGenerativeAI(apiKey);
+export class GeminiModel {
+  private readonly keys: string[];
+  private active = 0;
+
+  constructor(apiKeys: string[] = collectApiKeys()) {
+    this.keys = apiKeys.length > 0 ? apiKeys : [process.env.GEMINI_API_KEY || ""];
+    this.active = 0;
+  }
+
+  get activeKey(): string | undefined {
+    return this.keys[this.active];
   }
 
   generative(options: GeminiModelOptions = {}) {
-    return this.client.getGenerativeModel({
+    const client = new GoogleGenerativeAI(this.activeKey || "");
+    return client.getGenerativeModel({
       model: MODEL,
       generationConfig: {
         temperature: options.temperature ?? 0.7,
@@ -28,6 +46,33 @@ export class GeminiModel {
       systemInstruction: options.systemInstruction,
       safetySettings: GeminiModel.safety(),
     });
+  }
+
+  /**
+   * Jalankan operasi dengan failover otomatis ke API key cadangan
+   * ketika kunci aktif kena limit kuota (HTTP 429 / quota exhausted).
+   */
+  async run<T>(factory: (model: GeminiModel) => Promise<T>): Promise<T> {
+    const attempts = Math.max(1, this.keys.length);
+    let lastError: unknown;
+    for (let i = 0; i < attempts; i++) {
+      this.active = i;
+      try {
+        return await factory(this);
+      } catch (e) {
+        lastError = e;
+        if (GeminiModel.isQuotaError(e)) continue;
+        throw e;
+      }
+    }
+    throw lastError;
+  }
+
+  static isQuotaError(e: unknown): boolean {
+    const err = e as { status?: number; message?: string } | undefined;
+    if (err?.status === 429) return true;
+    const msg = (err?.message || "").toLowerCase();
+    return /quota|rate limit|429|exhausted|insufficient_quota|limit reached/.test(msg);
   }
 
   buildFoodPrompt(profile: ProfileInput): string {
@@ -192,7 +237,7 @@ TUGAS:
   errorMessage(e: unknown): string {
     const err = e as { status?: number; message?: string };
     if (err?.status === 429) {
-      return "Kuota Gemini hari ini sudah habis. Coba lagi besok, atau cek paket/billing di ai.google.dev.";
+      return "Kuota API AI hari ini sudah habis. Coba lagi besok, atau cek paket/billing di ai.google.dev.";
     }
     if (err?.status === 403) {
       return "GEMINI_API_KEY tidak valid atau tidak berizin. Periksa kembali kunci API-nya.";
