@@ -458,7 +458,7 @@ function MealRow({ entry }: { entry: FoodEntry }) {
 function CoachFloating({ profileId }: { profileId: string | null }) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([
-    { role: "assistant", content: "Halo! Aku siap bantu soal menu, kalori, dan makro kamu. 😊" },
+    { role: "assistant", content: "Halo! Aku Buddy, siap bantu soal menu, kalori, dan makro kamu. 😊" },
   ]);
   const [input, setInput] = useState("");
   const [chatLoading, setChatLoading] = useState(false);
@@ -523,7 +523,7 @@ function CoachFloating({ profileId }: { profileId: string | null }) {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" />
             </svg>
-            <span>Tanya Coach AI</span>
+            <span>Tanya Buddy</span>
           </button>
         </div>
       )}
@@ -540,7 +540,7 @@ function CoachFloating({ profileId }: { profileId: string | null }) {
                 </svg>
               </span>
               <div className="min-w-0 flex-1">
-                <h2 className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">Coach</h2>
+                <h2 className="truncate text-sm font-bold text-slate-900 dark:text-slate-100">Buddy</h2>
                 <p className="text-[10px] text-slate-400 dark:text-slate-500">Siap membantu kamu hari ini</p>
               </div>
               <button
