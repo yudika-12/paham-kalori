@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
-import { resolveProfileId } from "@/lib/client/profile-local";
+import { resolveProfile } from "@/lib/client/profile-local";
 import { useRequireAuth } from "@/lib/client/use-require-auth";
 import { FoodEntry, Metrics, dailyCalorieTarget, cleanMarkdown } from "@pk/core";
 import {
@@ -75,24 +75,27 @@ export default function DashboardPage() {
 
   const load = useCallback(async () => {
     try {
-      const profileId = await resolveProfileId();
-      if (!profileId) {
+      const profile = await resolveProfile();
+      if (!profile) {
         setLoading(false);
         return;
       }
-      setProfileId(profileId);
+      setProfileId(profile.id);
+      const since = startOfToday();
+      const until = new Date(since);
+      until.setDate(until.getDate() + 1);
       const [foodRes, metricsRes] = await Promise.all([
-        fetch(`/api/food?profileId=${profileId}`),
-        fetch(`/api/metrics?profileId=${profileId}`),
+        fetch(
+          `/api/food?profileId=${profile.id}&from=${since.toISOString()}&to=${until.toISOString()}`
+        ),
+        fetch(`/api/metrics?profileId=${profile.id}`),
       ]);
       const food = await foodRes.json();
       const m = await metricsRes.json();
       if (Array.isArray(food.entries)) setEntries(food.entries);
       if (m.metrics) setMetrics(m.metrics);
-      const onboarding = await fetch("/api/onboarding").then((r) => r.json());
-      const profile = onboarding.profiles?.[0];
-      if (profile?.name) setProfileName(profile.name);
-      if (profile?.goal) setGoal(profile.goal);
+      if (profile.name) setProfileName(profile.name);
+      if (profile.goal) setGoal(profile.goal);
     } catch {
       /* noop */
     } finally {

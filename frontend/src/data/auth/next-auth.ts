@@ -2,8 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { SignJWT, jwtVerify } from "jose";
 import type { JWTEncodeParams, JWTDecodeParams } from "next-auth/jwt";
-
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:4000";
+import { AuthService } from "@/server/services/auth.service";
 
 function secretKey(): Uint8Array {
   return new TextEncoder().encode(process.env.AUTH_SECRET || "");
@@ -50,13 +49,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!email || !password) return null;
 
         try {
-          const res = await fetch(`${BACKEND_URL}/api/auth/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
-          });
-          if (!res.ok) return null;
-          const user = await res.json();
+          const user = await new AuthService().login(email, password);
           if (!user?.id) return null;
           return { id: user.id, name: user.name, email: user.email };
         } catch {

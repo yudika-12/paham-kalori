@@ -4,16 +4,13 @@
   "private": true,
   "workspaces": [
     "frontend",
-    "backend",
     "shared"
   ],
   "scripts": {
-    "dev": "bash backend/scripts/dev.sh",
+    "dev": "npm run dev -w frontend",
     "build": "npm run build -w frontend",
-    "lint": "npm run lint -w frontend && npm run lint -w backend",
-    "db:push": "npm run db:push -w backend"
-  },
-  "devDependencies": {
-    "concurrently": "^9.1.0"
+    "lint": "npm run lint -w frontend",
+    "db:push": "npm run db:push -w frontend",
+    "generate": "npm run generate -w frontend"
   }
 }

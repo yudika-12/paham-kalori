@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import AppShell from "@/components/AppShell";
-import { resolveProfileId } from "@/lib/client/profile-local";
+import { resolveProfile, resolveProfileId } from "@/lib/client/profile-local";
 import { useRequireAuth } from "@/lib/client/use-require-auth";
 import { ChatMessage, cleanMarkdown, dailyCalorieTarget, FoodEntry } from "@pk/core";
 
@@ -109,19 +109,22 @@ export default function ChatPage() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const profileId = await resolveProfileId();
-      if (!profileId) return;
+      const profile = await resolveProfile();
+      if (!profile) return;
       try {
-        const [metricsRes, onboardingRes, foodRes, chatRes] = await Promise.all([
-          fetch(`/api/metrics?profileId=${profileId}`),
-          fetch("/api/onboarding"),
-          fetch(`/api/food?profileId=${profileId}`),
-          fetch(`/api/chat?profileId=${profileId}`),
+        const since = startOfToday();
+        const until = new Date(since);
+        until.setDate(until.getDate() + 1);
+        const [metricsRes, foodRes, chatRes] = await Promise.all([
+          fetch(`/api/metrics?profileId=${profile.id}`),
+          fetch(
+            `/api/food?profileId=${profile.id}&from=${since.toISOString()}&to=${until.toISOString()}`
+          ),
+          fetch(`/api/chat?profileId=${profile.id}`),
         ]);
         const m = await metricsRes.json();
-        const onboarding = await onboardingRes.json();
         const food = await foodRes.json();
-        const goal = onboarding.profiles?.[0]?.goal ?? "health";
+        const goal = profile.goal || "health";
         let target: number | null = null;
         if (m.metrics?.tdee) target = dailyCalorieTarget(m.metrics.tdee, goal);
 

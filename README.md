@@ -37,4 +37,4 @@ Open **[paham-kalori.vercel.app](https://paham-kalori.vercel.app)** in any brows
 - **Backend:** Hono (Node.js) + Prisma, PostgreSQL (Neon)
 - **AI:** Gemini for food recognition, calorie/nutrition estimates & chat responses (Server-Sent Events)
 - **Auth:** NextAuth with a custom login/register API
-- **Deploy:** Frontend & backend on Vercel as two projects — [paham-kalori.vercel.app](https://paham-kalori.vercel.app) and [paham-kalori-api.vercel.app](https://paham-kalori-api.vercel.app)
+- **Deploy:** Single Vercel project — [paham-kalori.vercel.app](https://paham-kalori.vercel.app) (Hono API runs as Next.js route handlers, no separate backend)

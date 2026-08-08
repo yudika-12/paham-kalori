@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import AppShell from "@/components/AppShell";
-import { resolveProfileId } from "@/lib/client/profile-local";
+import { resolveProfile } from "@/lib/client/profile-local";
 import { useRequireAuth } from "@/lib/client/use-require-auth";
 import { useSession, signOut } from "next-auth/react";
 import { dailyCalorieTarget } from "@pk/core";
@@ -38,17 +38,21 @@ export default function ProfilPage() {
 
   const load = useCallback(async () => {
     try {
-      const profileId = await resolveProfileId();
-      if (!profileId) {
+      const profile = await resolveProfile();
+      if (!profile) {
         setLoading(false);
         return;
       }
-      const [onboarding, metricsRes] = await Promise.all([
-        fetch("/api/onboarding").then((r) => r.json()),
-        fetch(`/api/metrics?profileId=${profileId}`).then((r) => r.json()),
-      ]);
-      const p = onboarding.profiles?.[0];
-      if (p) setProfile(p);
+      const metricsRes = await fetch(`/api/metrics?profileId=${profile.id}`).then((r) =>
+        r.json()
+      );
+      setProfile({
+        name: profile.name,
+        age: profile.age,
+        height: profile.height,
+        weight: profile.weight,
+        goal: profile.goal,
+      });
       if (metricsRes.metrics) setMetrics(metricsRes.metrics);
     } catch {
       /* noop */

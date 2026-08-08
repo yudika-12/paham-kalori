@@ -15,7 +15,13 @@ foodRoutes.get("/", async (c) => {
     }
     const userId = c.get("userId") as string;
     await requireProfile(profileId, userId);
-    const entries = await nutrition.list(profileId);
+    const from = c.req.query("from");
+    const to = c.req.query("to");
+    const entries = await nutrition.list(
+      profileId,
+      from ? new Date(from) : undefined,
+      to ? new Date(to) : undefined
+    );
     return c.json({ entries });
   } catch (e) {
     const status = isAppError(e) ? e.statusCode : 500;

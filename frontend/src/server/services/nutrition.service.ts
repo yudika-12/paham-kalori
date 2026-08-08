@@ -22,8 +22,11 @@ export class NutritionService {
     private readonly gemini = new GeminiModel()
   ) {}
 
-  async list(profileId: string) {
-    const entries = await this.foods.listByProfile(profileId);
+  async list(profileId: string, from?: Date, to?: Date) {
+    const entries =
+      from && to
+        ? await this.foods.listToday(profileId, from, to)
+        : await this.foods.listByProfile(profileId);
     return entries.map((e) => ({ ...e, createdAt: e.createdAt.toISOString() }));
   }
 
