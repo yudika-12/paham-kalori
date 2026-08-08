@@ -132,7 +132,7 @@ npx vercel --prod --yes --scope acme-22b3     # run from repo root (project Root
 ```bash
 curl https://paham-kalori.vercel.app/api/health                    # → 200 "ok"
 curl -X POST .../api/auth/check-email -d '{"email":"x@y.z"}'        # → {"exists":false}
-curl .../api/food                                                   # → 401 tanpa sesi
+curl .../api/food                                                   # → 401 without a session
 ```
 
 ## Key Environment Variables
