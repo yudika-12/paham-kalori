@@ -178,11 +178,6 @@ export default function DashboardPage() {
                   <span className="text-xs font-semibold text-white/80">kcal</span>
                 ) : null}
               </div>
-              <p className="mt-1 text-[11px] font-medium text-white/70">
-                {target
-                  ? `dari ${target.toLocaleString("id-ID")} kcal`
-                  : "Lengkapi data tubuh untuk menghitung target"}
-              </p>
             </div>
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/15 ring-1 ring-white/15">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-white">
