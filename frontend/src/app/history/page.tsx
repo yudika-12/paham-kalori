@@ -206,42 +206,42 @@ export default function HistoryPage() {
                         <div className="relative ml-2 space-y-4 border-l-2 border-slate-200 pl-4 dark:border-slate-700 sm:pl-5">
                           {MAIN_SLOTS.map((slot) => {
                             const slotEntries = group.list.filter((e) => mealSlotForEntry(e) === slot);
-                            if (slotEntries.length > 0) {
-                              return slotEntries.map((e) => (
-                                <TimelineEntry
-                                  key={e.id}
-                                  entry={e}
-                                  label={slot}
-                                  editing={editingId === e.id}
-                                  onEdit={() => setEditingId(e.id)}
-                                  onRemove={() => remove(e.id)}
-                                  onCancelEdit={() => setEditingId(null)}
-                                  onSave={(data) => update(e.id, data)}
-                                />
-                              ));
-                            }
                             const over = slotIsOver(slot, group.dayKey, new Date());
                             return (
                               <div key={slot}>
-                                <div className="mb-1 flex items-center gap-2">
-                                  <span className="h-2.5 w-2.5 rounded-full bg-slate-300" />
-                                  <p className="text-[12px] font-bold text-slate-500">{slot}</p>
+                                <div className="relative">
+                                  <span className="absolute -left-[23px] top-1 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500" />
+                                  <p className="text-[12px] font-bold text-slate-600">{slot}</p>
                                 </div>
-                                {over ? (
-                                  <div className="flex items-center justify-between rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 px-4 py-3 opacity-70">
-                                    <p className="text-[12px] font-medium text-slate-400">
-                                      Berakhir pukul {SLOT_END_HOUR[slot]}.00
-                                    </p>
-                                  </div>
-                                ) : (
-                                  <Link
-                                    href="/scan"
-                                    className="flex items-center justify-between rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-3 transition hover:border-[#2E7D32] hover:bg-emerald-50/50"
-                                  >
-                                    <span className="text-[12px] font-semibold text-slate-500">Belum ada</span>
-                                    <span className="text-[12px] font-bold text-[#2E7D32]">+ Catat</span>
-                                  </Link>
-                                )}
+                                <div className="mt-2 space-y-1.5">
+                                  {slotEntries.length > 0 ? (
+                                    slotEntries.map((e) => (
+                                      <TimelineEntry
+                                        key={e.id}
+                                        entry={e}
+                                        editing={editingId === e.id}
+                                        onEdit={() => setEditingId(e.id)}
+                                        onRemove={() => remove(e.id)}
+                                        onCancelEdit={() => setEditingId(null)}
+                                        onSave={(data) => update(e.id, data)}
+                                      />
+                                    ))
+                                  ) : over ? (
+                                    <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/70 px-3 py-2.5 opacity-70">
+                                      <p className="text-[12px] font-medium text-slate-400">
+                                        Berakhir pukul {SLOT_END_HOUR[slot]}.00
+                                      </p>
+                                    </div>
+                                  ) : (
+                                    <Link
+                                      href="/scan"
+                                      className="flex items-center justify-between rounded-xl border border-dashed border-slate-300 bg-white px-3 py-2.5 transition hover:border-[#2E7D32] hover:bg-emerald-50/50"
+                                    >
+                                      <span className="text-[12px] font-semibold text-slate-500">Belum ada</span>
+                                      <span className="text-[12px] font-bold text-[#2E7D32]">+ Catat</span>
+                                    </Link>
+                                  )}
+                                </div>
                               </div>
                             );
                           })}
@@ -406,7 +406,6 @@ function ChartPanel({
 
 function TimelineEntry({
   entry,
-  label,
   editing,
   onEdit,
   onRemove,
@@ -414,7 +413,6 @@ function TimelineEntry({
   onSave,
 }: {
   entry: FoodEntry;
-  label?: string;
   editing: boolean;
   onEdit: () => void;
   onRemove: () => void;
@@ -432,48 +430,42 @@ function TimelineEntry({
   });
   const gradeColor =
     grade.grade === "A" ? "#2E7D32" : grade.grade === "B" ? "#ca8a04" : grade.grade === "C" ? "#ea580c" : "#dc2626";
+  if (editing) {
+    return <EditCard entry={entry} onCancel={onCancelEdit} onSave={onSave} />;
+  }
   return (
-    <div className="relative">
-      <span className="absolute -left-[27px] top-5 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500" />
-      <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">
-        {time}{label ? ` ${label}` : ""}
-      </p>
-      {editing ? (
-        <EditCard entry={entry} onCancel={onCancelEdit} onSave={onSave} />
-      ) : (
-        <div className="mt-2 flex items-center gap-2 rounded-xl border border-slate-200/70 bg-white px-3 py-2.5 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-          <div className="min-w-0 flex-1">
-            <p className="text-[12px] font-bold leading-snug text-slate-800 dark:text-slate-200">{entry.name}</p>
-            <p className="text-[11px] text-slate-400">
-              K {entry.carbs ?? "—"}g • P {entry.protein ?? "—"}g • L {entry.fat ?? "—"}g
-            </p>
-          </div>
-          <div className="flex items-center gap-1">
-            <span
-              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[11px] font-extrabold text-white"
-              style={{ background: gradeColor }}
-              title={`Grade ${grade.grade}`}
-            >
-              {grade.grade}
-            </span>
-            <span className="shrink-0 rounded-full bg-orange-50 px-2.5 py-0.5 text-xs font-extrabold text-orange-600">
-              {entry.calories} kkal
-            </span>
-            <div className="flex shrink-0 gap-0.5">
-              <IconButton title="Edit" onClick={onEdit} hover="hover:bg-emerald-50 hover:text-emerald-600">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5">
-                  <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
-                </svg>
-              </IconButton>
-              <IconButton title="Hapus" onClick={onRemove} hover="hover:bg-red-50 hover:text-red-500">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5">
-                  <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
-                </svg>
-              </IconButton>
-            </div>
-          </div>
+    <div className="flex items-center gap-2 rounded-xl border border-slate-200/70 bg-white px-3 py-2 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+      <span className="w-9 shrink-0 text-[11px] font-bold text-slate-400">{time}</span>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-[12px] font-bold leading-snug text-slate-800 dark:text-slate-200">{entry.name}</p>
+        <p className="text-[11px] text-slate-400">
+          K {entry.carbs ?? "—"}g • P {entry.protein ?? "—"}g • L {entry.fat ?? "—"}g
+        </p>
+      </div>
+      <div className="flex items-center gap-1">
+        <span
+          className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[11px] font-extrabold text-white"
+          style={{ background: gradeColor }}
+          title={`Grade ${grade.grade}`}
+        >
+          {grade.grade}
+        </span>
+        <span className="shrink-0 rounded-full bg-orange-50 px-2.5 py-0.5 text-xs font-extrabold text-orange-600">
+          {entry.calories} kkal
+        </span>
+        <div className="flex shrink-0 gap-0.5">
+          <IconButton title="Edit" onClick={onEdit} hover="hover:bg-emerald-50 hover:text-emerald-600">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5">
+              <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+            </svg>
+          </IconButton>
+          <IconButton title="Hapus" onClick={onRemove} hover="hover:bg-red-50 hover:text-red-500">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-3.5 w-3.5">
+              <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+            </svg>
+          </IconButton>
         </div>
-      )}
+      </div>
     </div>
   );
 }

@@ -32,15 +32,15 @@ function recommendations(analysis: FoodAnalysis): string[] {
   const fat = analysis.fat ?? 0;
   const carbs = analysis.carbs ?? 0;
   if (protein < MACRO_TARGETS.protein * 0.2) {
-    list.push("Tambah sumber protein seperti telur, ayam, atau tahu agar kenyang lebih lama.");
+    list.push("Tambahkan protein (telur/ayam/tahu).");
   } else {
-    list.push("Kandungan protein cukup baik. Pertahankan porsi protein ini.");
+    list.push("Protein cukup.");
   }
   if (fat > MACRO_TARGETS.fat * 0.15) {
-    list.push("Lemak sedikit tinggi — pertimbangkan cara masak panggang/rebus untuk menurunkannya.");
+    list.push("Lemak agak tinggi, pilih panggang/rebus.");
   }
   if (carbs > MACRO_TARGETS.carbs * 0.2) {
-    list.push("Seimbangkan karbohidrat dengan sayur dan protein agar gula darah lebih stabil.");
+    list.push("Imbangi karbohidrat dengan sayur & protein.");
   }
   return list.slice(0, 2);
 }
@@ -637,7 +637,6 @@ function ResultView({
                   </button>
                 </div>
               )}
-              <p className="mt-1 text-[11px] leading-relaxed text-slate-500">{result.note}</p>
             </div>
 
           <div className="mt-3 inline-flex items-center gap-2 rounded-xl px-2.5 py-1" style={{ background: gradeBg }}>
@@ -650,7 +649,7 @@ function ResultView({
             <div>
               <p className="text-[12px] font-bold text-slate-800">Grade {grade.grade}</p>
               <p className="text-[11px] font-medium" style={{ color: gradeColor }}>
-                {GRADE_LABEL[grade.grade]} · Skor {grade.score}
+                {GRADE_LABEL[grade.grade]}
               </p>
             </div>
           </div>
