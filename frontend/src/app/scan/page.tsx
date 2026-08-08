@@ -5,6 +5,7 @@ import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import ErrorBanner from "@/components/ErrorBanner";
 import { resolveProfileId } from "@/lib/client/profile-local";
+import { invalidateApiCache } from "@/lib/client/api-cache";
 import { imageCompressor } from "@/lib/image";
 import { useRequireAuth } from "@/lib/client/use-require-auth";
 import { FoodAnalysis, mealTypeForHour } from "@pk/core";
@@ -157,6 +158,7 @@ export default function ScanPage() {
       if (!res.ok) throw new Error(data.error || "Ups, belum bisa menganalisis sekarang. Coba lagi ya.");
       setResult(data.analysis);
       setSaved(data.saved);
+      if (data.saved) invalidateApiCache();
       if (data.analysis && !data.saved) {
         setError("Foto tidak jelas atau bukan makanan. Coba foto ulang ya.");
       }
@@ -213,6 +215,7 @@ export default function ScanPage() {
         if (patch.ok) {
           const { entry } = await patch.json();
           setSaved(entry);
+          invalidateApiCache();
         }
       }
     } catch (e) {

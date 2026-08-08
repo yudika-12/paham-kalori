@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { resolveProfile } from "@/lib/client/profile-local";
+import { cachedGet } from "@/lib/client/api-cache";
 import { useRequireAuth } from "@/lib/client/use-require-auth";
 import { useSession, signOut } from "next-auth/react";
 import { dailyCalorieTarget } from "@pk/core";
@@ -70,8 +71,8 @@ export default function ProfilPage() {
         setLoading(false);
         return;
       }
-      const metricsRes = await fetch(`/api/metrics?profileId=${profile.id}`).then((r) =>
-        r.json()
+      const data = await cachedGet(`metrics:${profile.id}`, () =>
+        fetch(`/api/metrics?profileId=${profile.id}`).then((r) => r.json())
       );
       setProfile({
         name: profile.name,
@@ -80,7 +81,7 @@ export default function ProfilPage() {
         weight: profile.weight,
         goal: profile.goal,
       });
-      if (metricsRes.metrics) setMetrics(metricsRes.metrics);
+      if (data.metrics) setMetrics(data.metrics);
     } catch {
       /* noop */
     } finally {

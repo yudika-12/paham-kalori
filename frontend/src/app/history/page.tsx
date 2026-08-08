@@ -5,6 +5,7 @@ import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { resolveProfile } from "@/lib/client/profile-local";
 import { useRequireAuth } from "@/lib/client/use-require-auth";
+import { cachedGet, invalidateApiCache } from "@/lib/client/api-cache";
 import { FoodEntry, Metrics, dailyCalorieTarget } from "@pk/core";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceLine } from "recharts";
 import { thisWeek, thisMonth, nutritionGrade, DayTotals } from "@/lib/nutrition-stats";
@@ -42,26 +43,16 @@ function toDayStr(d: Date): string {
   return x.toLocaleDateString("en-CA");
 }
 
-function dayTitle(dayStr: string): string {
-  return new Date(dayStr + "T00:00:00").toLocaleDateString("id-ID", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
-
 function dayLabel(dayStr: string): string {
   const d = new Date(dayStr + "T00:00:00");
   const today = new Date();
   const sameDay = (a: Date, b: Date) =>
     a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
-  const date = dayTitle(dayStr);
-  if (sameDay(d, today)) return `Hari ini, ${date}`;
+  if (sameDay(d, today)) return "Hari ini";
   const y = new Date(today);
   y.setDate(y.getDate() - 1);
-  if (sameDay(d, y)) return `Kemarin, ${date}`;
-  return date;
+  if (sameDay(d, y)) return "Kemarin";
+  return d.toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" });
 }
 
 export default function HistoryPage() {
@@ -101,15 +92,13 @@ export default function HistoryPage() {
         setLoading(false);
         return;
       }
-      const [foodRes, metricsRes] = await Promise.all([
-        fetch(`/api/food?profileId=${profile.id}`),
-        fetch(`/api/metrics?profileId=${profile.id}`),
-      ]);
-      const data = await foodRes.json();
-      const m = await metricsRes.json();
+      const key = `dash:${profile.id}`;
+      const data = await cachedGet(key, () =>
+        fetch(`/api/dashboard?profileId=${profile.id}`).then((r) => r.json())
+      );
       if (Array.isArray(data.entries)) setEntries(data.entries);
-      if (m.metrics) setMetrics(m.metrics);
-      if (profile.goal) setGoal(profile.goal);
+      if (data.metrics) setMetrics(data.metrics);
+      if (data.goal) setGoal(data.goal);
     } catch {
       /* noop */
     } finally {
@@ -125,7 +114,10 @@ export default function HistoryPage() {
 
   async function remove(id: string) {
     const res = await fetch(`/api/food?id=${id}`, { method: "DELETE" });
-    if (res.ok) setEntries((prev) => prev.filter((e) => e.id !== id));
+    if (res.ok) {
+      setEntries((prev) => prev.filter((e) => e.id !== id));
+      invalidateApiCache();
+    }
   }
 
   async function update(id: string, data: { name: string; calories: number }) {
@@ -138,6 +130,7 @@ export default function HistoryPage() {
       const { entry } = await res.json();
       setEntries((prev) => prev.map((e) => (e.id === id ? entry : e)));
       setEditingId(null);
+      invalidateApiCache();
     }
   }
 
@@ -192,10 +185,7 @@ export default function HistoryPage() {
             {entries.length > 0 && (
               <div className="pt-1">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-[14px] font-bold text-slate-900">Log Harian</h2>
-                    <p className="text-xs text-slate-400">Timeline makanmu dari hari ke hari</p>
-                  </div>
+                  <h2 className="text-[14px] font-bold text-slate-900">Log Harian</h2>
                   <Link href="/scan" className="text-[12px] font-bold text-[#2E7D32]">
                     + Catat
                   </Link>
@@ -240,7 +230,7 @@ export default function HistoryPage() {
                                 {over ? (
                                   <div className="flex items-center justify-between rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 px-4 py-3 opacity-70">
                                     <p className="text-[12px] font-medium text-slate-400">
-                                      Waktu pencatatan telah berakhir pada pukul {SLOT_END_HOUR[slot]}.00
+                                      Berakhir pukul {SLOT_END_HOUR[slot]}.00
                                     </p>
                                   </div>
                                 ) : (
@@ -248,8 +238,8 @@ export default function HistoryPage() {
                                     href="/scan"
                                     className="flex items-center justify-between rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-3 transition hover:border-[#2E7D32] hover:bg-emerald-50/50"
                                   >
-                                    <span className="text-[12px] font-semibold text-slate-500">Belum ada makan</span>
-                                    <span className="text-[12px] font-bold text-[#2E7D32]">+ Tap untuk catat</span>
+                                    <span className="text-[12px] font-semibold text-slate-500">Belum ada</span>
+                                    <span className="text-[12px] font-bold text-[#2E7D32]">+ Catat</span>
                                   </Link>
                                 )}
                               </div>

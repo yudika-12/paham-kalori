@@ -7,6 +7,7 @@ import { foodRoutes } from "./routes/food.route";
 import { metricsRoutes } from "./routes/metrics.route";
 import { chatRoutes } from "./routes/chat.route";
 import { nutritionRoutes } from "./routes/nutrition.route";
+import { dashboardRoutes } from "./routes/dashboard.route";
 import { isAppError, errorMessage } from "@pk/core";
 
 export const app = new Hono<{ Variables: { userId: string } }>();
@@ -35,11 +36,13 @@ app.route("/api/register", registerRoutes);
 app.use("/api/onboarding/*", authMiddleware);
 app.use("/api/food/*", authMiddleware);
 app.use("/api/metrics/*", authMiddleware);
+app.use("/api/dashboard/*", authMiddleware);
 app.use("/api/chat/*", authMiddleware);
 app.use("/api/nutrition/*", authMiddleware);
 app.route("/api/onboarding", onboardingRoutes);
 app.route("/api/food", foodRoutes);
 app.route("/api/metrics", metricsRoutes);
+app.route("/api/dashboard", dashboardRoutes);
 app.route("/api/chat", chatRoutes);
 app.route("/api/nutrition", nutritionRoutes);
 

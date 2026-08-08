@@ -5,6 +5,7 @@ import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { resolveProfile } from "@/lib/client/profile-local";
 import { useRequireAuth } from "@/lib/client/use-require-auth";
+import { cachedGet } from "@/lib/client/api-cache";
 import { FoodEntry, Metrics, dailyCalorieTarget, cleanMarkdown } from "@pk/core";
 import {
   MACRO_TARGETS,
@@ -81,17 +82,15 @@ export default function DashboardPage() {
       const since = startOfToday();
       const until = new Date(since);
       until.setDate(until.getDate() + 1);
-      const [foodRes, metricsRes] = await Promise.all([
+      const key = `dash:${profile.id}:${since.toISOString()}`;
+      const data = await cachedGet(key, () =>
         fetch(
-          `/api/food?profileId=${profile.id}&from=${since.toISOString()}&to=${until.toISOString()}`
-        ),
-        fetch(`/api/metrics?profileId=${profile.id}`),
-      ]);
-      const food = await foodRes.json();
-      const m = await metricsRes.json();
-      if (Array.isArray(food.entries)) setEntries(food.entries);
-      if (m.metrics) setMetrics(m.metrics);
-      if (profile.goal) setGoal(profile.goal);
+          `/api/dashboard?profileId=${profile.id}&from=${encodeURIComponent(since.toISOString())}&to=${encodeURIComponent(until.toISOString())}`
+        ).then((r) => r.json())
+      );
+      if (Array.isArray(data.entries)) setEntries(data.entries);
+      if (data.metrics) setMetrics(data.metrics);
+      if (data.goal) setGoal(data.goal);
     } catch {
       /* noop */
     } finally {
