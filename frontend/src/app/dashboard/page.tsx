@@ -233,26 +233,6 @@ export default function DashboardPage() {
               </svg>
             </span>
           </button>
-          {macroOpen && (
-            <div className="mt-3 border-t border-slate-100 pt-4 anim-notif-in" key="micro">
-              <p className="text-[12px] font-bold text-slate-700">Mikronutrisi</p>
-              <div className="mt-3 grid grid-cols-3 gap-2.5">
-                {[
-                  { label: "Serat", value: micros.serat, unit: "g" },
-                  { label: "Gula", value: micros.gula, unit: "g" },
-                  { label: "Natrium", value: micros.natrium, unit: "mg" },
-                ].map((t) => (
-                  <div key={t.label} className="rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-100">
-                    <p className="text-[10px] font-semibold text-slate-400">{t.label}</p>
-                    <p className="mt-0.5 text-lg font-extrabold text-slate-900">
-                      {Math.round(t.value).toLocaleString("id-ID")}
-                      <span className="ml-0.5 text-[10px] font-semibold text-slate-400">{t.unit}</span>
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
           <div className="mt-3 space-y-2.5">
             {MACRO_ORDER.map((key) => (
               <MacroCard
@@ -265,6 +245,26 @@ export default function DashboardPage() {
               />
             ))}
           </div>
+          {macroOpen && (
+            <div className="mt-3 border-t border-dashed border-slate-200 pt-3 anim-notif-in" key="micro">
+              <p className="text-[11px] font-bold text-slate-500">Mikronutrisi</p>
+              <div className="mt-2.5 grid grid-cols-3 gap-2">
+                {[
+                  { label: "Serat", value: micros.serat, unit: "g" },
+                  { label: "Gula", value: micros.gula, unit: "g" },
+                  { label: "Natrium", value: micros.natrium, unit: "mg" },
+                ].map((t) => (
+                  <div key={t.label} className="rounded-xl bg-slate-50 p-2 ring-1 ring-slate-100">
+                    <p className="text-[9px] font-semibold text-slate-400">{t.label}</p>
+                    <p className="mt-0.5 text-sm font-bold text-slate-800">
+                      {Math.round(t.value).toLocaleString("id-ID")}
+                      <span className="ml-0.5 text-[9px] font-semibold text-slate-400">{t.unit}</span>
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="mt-5">
