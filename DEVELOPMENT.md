@@ -32,7 +32,7 @@ paham-kalori/
 │   │   │   ├── auth/jwt.ts    # HS256 sign/verify
 │   │   │   ├── db/prisma.ts   # Prisma client + Neon adapter
 │   │   │   ├── middleware/    # auth, require-profile guards
-│   │   │   ├── routes/        # auth, register, onboarding, food, metrics, dashboard, chat, nutrition
+│   │   │   ├── routes/        # auth, register, onboarding, food, metrics, dashboard, chat
 │   │   │   ├── services/      # business logic (auth, metric, nutrition, chat)
 │   │   │   └── repositories/  # data access (user, profile, food, chat)
 │   │   ├── data/auth/         # NextAuth config
@@ -70,8 +70,7 @@ There is no separate backend project. The `@pk/core` workspace is installed from
         |    ├─ auth / register                       |
         |    ├─ onboarding / food / metrics           |
         |    ├─ dashboard (combined: food+metrics)    |
-        |    ├─ chat (SSE stream)                     |
-        |    └─ nutrition/analyze                     |
+        |    └─ chat (SSE stream)                     |
         |  Api call → Prisma → Neon PostgreSQL        |
         |             → Gemini (food analysis/chat)   |
         +-------------------------------------------+

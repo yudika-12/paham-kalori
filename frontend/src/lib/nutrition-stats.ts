@@ -2,15 +2,6 @@ import { FoodEntry } from "@pk/core";
 
 export const MACRO_TARGETS = { carbs: 200, protein: 120, fat: 70 };
 
-export const STREAK_MILESTONES = [
-  { days: 3, label: "3 hari", reward: "Grafik 7 hari", emoji: "📊" },
-  { days: 7, label: "1 minggu", reward: "Ringkasan mingguan", emoji: "🔥" },
-  { days: 30, label: "1 bulan", reward: "Ringkasan bulanan", emoji: "🏆" },
-  { days: 90, label: "3 bulan", reward: "Lencana Konsisten", emoji: "💪" },
-  { days: 180, label: "6 bulan", reward: "Lencana Setia", emoji: "🥇" },
-  { days: 365, label: "1 tahun", reward: "Lencana Legenda", emoji: "👑" },
-];
-
 export interface DayTotals {
   label: string;
   kalori: number;
@@ -25,30 +16,10 @@ export function todayLabel(): string {
   return `${day}, ${date}`;
 }
 
-export function dayKey(d: Date): number {
-  const x = new Date(d);
-  x.setHours(0, 0, 0, 0);
-  return x.getTime();
-}
-
 export function startOfToday(): Date {
   const d = new Date();
   d.setHours(0, 0, 0, 0);
   return d;
-}
-
-export function consecutiveStreak(days: Set<number>): number {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const cursor = days.has(today.getTime()) ? today : yesterday;
-  let streak = 0;
-  while (days.has(cursor.getTime())) {
-    streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  return streak;
 }
 
 export function thisWeek(entries: FoodEntry[], target: number | null, from: Date = new Date()): DayTotals[] {
@@ -143,42 +114,4 @@ export function nutritionGrade(macs: {
   const score = Math.round(makroPts + mikroWeighted);
   const grade = score >= 90 ? "A" : score >= 75 ? "B" : score >= 60 ? "C" : score >= 45 ? "D" : "E";
   return { score, grade };
-}
-
-export function macroInsight(macros: MacroState): { emoji: string; text: string; kind: "ok" | "short" | "over" } {
-  const proteinShort = Math.round(MACRO_TARGETS.protein - macros.protein);
-  const carbOver = Math.round(macros.carbs - MACRO_TARGETS.carbs);
-  const fatOver = Math.round(macros.fat - MACRO_TARGETS.fat);
-  if (proteinShort >= 5) return { emoji: "💪", text: `Protein masih kurang ${proteinShort} g`, kind: "short" };
-  if (fatOver >= 8) return { emoji: "⚠️", text: `Lemak berlebih ${fatOver} g`, kind: "over" };
-  if (carbOver >= 10) return { emoji: "⚠️", text: `Karbohidrat berlebih ${carbOver} g`, kind: "over" };
-  return { emoji: "✅", text: "Asupan makro sudah seimbang", kind: "ok" };
-}
-
-export function coachMessage(macros: MacroState): { head: string; suggestions: string[] } {
-  const proteinShort = Math.round(MACRO_TARGETS.protein - macros.protein);
-  const carbOver = Math.round(macros.carbs - MACRO_TARGETS.carbs);
-  const fatOver = Math.round(macros.fat - MACRO_TARGETS.fat);
-  if (proteinShort >= 5) {
-    return {
-      head: `Protein masih kurang ${proteinShort} gram. Fokus protein di menu berikutnya!`,
-      suggestions: ["2 butir telur", "100g dada ayam panggang", "150g tempe"],
-    };
-  }
-  if (fatOver >= 8) {
-    return {
-      head: `Lemak mendekati target. Perhatikan porsi gorengan dan santan.`,
-      suggestions: ["Ganti gorengan dengan panggang/rebus", "Pilih susu rendah lemak"],
-    };
-  }
-  if (carbOver >= 10) {
-    return {
-      head: `Karbohidrat sedikit di atas target. Seimbangkan dengan protein & serat.`,
-      suggestions: ["Ganti nasi putih dengan nasi merah", "Tambah sayur untuk kenyang lebih lama"],
-    };
-  }
-  return {
-    head: "Asupan makro hari ini sudah seimbang. Pertahankan!",
-    suggestions: [],
-  };
 }

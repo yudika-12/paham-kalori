@@ -135,58 +135,6 @@ export class NutritionService {
     return { ok: true };
   }
 
-  async analyzeToday(profile: ProfileEntity): Promise<{ analysis: string }> {
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(start);
-    end.setDate(end.getDate() + 1);
-
-    const entries = await this.foods.listToday(profile.id, start, end);
-    if (!entries.length) {
-      throw new BadRequestError("Belum ada catatan makanan hari ini.");
-    }
-
-    const totals = entries.reduce(
-      (acc, e) => ({
-        calories: acc.calories + e.calories,
-        protein: acc.protein + (e.protein ?? 0),
-        carbs: acc.carbs + (e.carbs ?? 0),
-        fat: acc.fat + (e.fat ?? 0),
-        fiber: acc.fiber + (e.fiber ?? 0),
-        sugar: acc.sugar + (e.sugar ?? 0),
-        sodium: acc.sodium + (e.sodium ?? 0),
-        iron: acc.iron + (e.iron ?? 0),
-        vitaminC: acc.vitaminC + (e.vitaminC ?? 0),
-      }),
-      { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, sugar: 0, sodium: 0, iron: 0, vitaminC: 0 }
-    );
-
-    const summary = [
-      `Kalori: ${totals.calories} kkal`,
-      `Karbohidrat: ${totals.carbs} g`,
-      `Protein: ${totals.protein} g`,
-      `Lemak: ${totals.fat} g`,
-      `Serat: ${totals.fiber} g`,
-      `Gula: ${totals.sugar} g`,
-      `Natrium: ${totals.sodium} mg`,
-      `Zat Besi: ${totals.iron} mg`,
-      `Vitamin C: ${totals.vitaminC} mg`,
-      `Makanan: ${entries.map((e) => `${e.name} (${e.calories} kkal)`).join(", ")}`,
-    ].join("\n");
-
-    const prompt = this.gemini.buildNutritionAnalysisPrompt(profile.toInput(), summary);
-    let result;
-    try {
-      result = await this.gemini.run((m) =>
-        m.generative({ temperature: 0.7, json: false }).generateContent(prompt)
-      );
-    } catch (e) {
-      throw NutritionService.toAppError(e, "Gagal menganalisis makronutrien.");
-    }
-    const analysis = this.gemini.cleanMarkdown(result.response.text().trim());
-    return { analysis };
-  }
-
   private async assertOwned(userId: string, profileId: string) {
     const owned = await this.profiles.findOwnedById(profileId, userId);
     if (!owned) throw new NotFoundError("Bukan punyamu.");

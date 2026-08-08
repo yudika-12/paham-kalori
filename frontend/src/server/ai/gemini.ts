@@ -173,25 +173,6 @@ PANDUAN:
 8. Gunakan emoji secukupnya (maksimal 1-2) untuk membuat suasana ceria.`;
   }
 
-  buildNutritionAnalysisPrompt(profile: ProfileInput, summary: string): string {
-    return `
-Kamu adalah ahli gizi di aplikasi "Paham Kalori". Analisa asupan makronutrien user hari ini secara singkat dan ramah.
-
-PROFIL USER:
-- Umur ${profile.age}, ${profile.gender}, ${profile.height} cm, ${profile.weight} kg
-- Tujuan: ${profile.goal}
-
-ASUPAN HARI INI (total):
-${summary}
-
-TUGAS:
-1. Beri analisa 2-3 kalimat dalam Bahasa Indonesia, hangat dan singkat.
-2. Jika ada makronutrien yang TINGGI/berlebihan atau sangat rendah, sebut dengan ramah lalu beri 1 saran praktis (contoh makanan pengganti atau saran porsi).
-3. Jika keseimbangan makro sudah baik, beri pujian singkat dan tetap semangati.
-4. JANGAN gunakan markdown sama sekali: tanpa bintang (** atau *), tanpa #, tanpa backtick. Tulis teks polos.
-5. Gunakan emoji secukupnya.`;
-  }
-
   parseFoodAnalysis(text: string): FoodAnalysis {
     try {
       const cleaned = text.replace(/^```json\s*|\s*```$/g, "").trim();
@@ -276,5 +257,3 @@ TUGAS:
     ];
   }
 }
-
-export const geminiModel = new GeminiModel();
