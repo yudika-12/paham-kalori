@@ -230,25 +230,25 @@ TUGAS:
         items: items && items.length > 0 ? items : undefined,
       };
     } catch {
-      throw new Error("Gagal memproses respons AI, coba lagi.");
+      throw new Error("Hmm, aku belum paham gambar ini. Coba kirim foto yang lebih jelas atau tulis ulang nama makanannya ya 😊");
     }
   }
 
   errorMessage(e: unknown): string {
     const err = e as { status?: number; message?: string };
     if (err?.status === 429) {
-      return "Kuota API AI hari ini sudah habis. Coba lagi besok, atau cek paket/billing di ai.google.dev.";
+      return "Hmm, sepertinya sedang sangat ramai di sini, jadi aku belum bisa melayani sekarang. Yuk coba lagi nanti atau besok ya? 😊";
     }
     if (err?.status === 403) {
-      return "GEMINI_API_KEY tidak valid atau tidak berizin. Periksa kembali kunci API-nya.";
+      return "Maaf, aku belum bisa membantumu kali ini. Tunggu sebentar lalu coba lagi ya. 🙏";
     }
     if (err?.status === 400 || err?.status === 404) {
-      return "Permintaan ke Gemini ditolak (model/format tidak valid).";
+      return "Maaf, ada sedikit kendala dari sisi aku. Coba lagi sebentar lagi ya.";
     }
     if (e instanceof Error && e.message.includes("Gagal memproses")) {
       return e.message;
     }
-    return "Gagal memproses. Periksa koneksi internet dan GEMINI_API_KEY.";
+    return "Yah, ada kendala kecil di perjalanan. Coba lagi ya — insyaAllah bisa! 🙏";
   }
 
   cleanMarkdown(text: string): string {

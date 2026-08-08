@@ -154,7 +154,7 @@ export default function ScanPage() {
         body: JSON.stringify({ profileId, image: preview, mealType: mealTypeForHour(new Date().getHours()) }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Gagal menganalisis.");
+      if (!res.ok) throw new Error(data.error || "Ups, belum bisa menganalisis sekarang. Coba lagi ya.");
       setResult(data.analysis);
       setSaved(data.saved);
       if (data.analysis && !data.saved) {
