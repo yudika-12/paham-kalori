@@ -233,18 +233,6 @@ export default function DashboardPage() {
               </svg>
             </span>
           </button>
-          <div className="mt-3 space-y-2.5">
-            {MACRO_ORDER.map((key) => (
-              <MacroCard
-                key={key}
-                kind={key}
-                label={MACRO_UI[key].label}
-                grams={macros[key]}
-                target={MACRO_TARGETS[key]}
-                color={MACRO_UI[key].color}
-              />
-            ))}
-          </div>
           {macroOpen && (
             <div className="mt-3 border-t border-slate-100 pt-4 anim-notif-in" key="micro">
               <p className="text-[12px] font-bold text-slate-700">Mikronutrisi</p>
@@ -265,6 +253,18 @@ export default function DashboardPage() {
               </div>
             </div>
           )}
+          <div className="mt-3 space-y-2.5">
+            {MACRO_ORDER.map((key) => (
+              <MacroCard
+                key={key}
+                kind={key}
+                label={MACRO_UI[key].label}
+                grams={macros[key]}
+                target={MACRO_TARGETS[key]}
+                color={MACRO_UI[key].color}
+              />
+            ))}
+          </div>
         </section>
 
         <section className="mt-5">

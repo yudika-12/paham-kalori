@@ -189,8 +189,6 @@ export default function HistoryPage() {
 
             <ChartPanel days={days} target={target} range={range} />
 
-            <TargetReachedCard days={days} target={target} />
-
             <SummaryCard days={days} target={target} />
 
             {entries.length > 0 && (
@@ -415,35 +413,6 @@ function ChartPanel({
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-      </div>
-    </div>
-  );
-}
-
-function TargetReachedCard({ days, target }: { days: DayTotals[]; target: number | null }) {
-  const reached = days.filter((d) => d.kalori > 0 && target && d.kalori <= target).length;
-  return (
-    <div className="rounded-3xl border border-slate-200/70 bg-white p-5 shadow-sm">
-      <h2 className="text-[15px] font-bold text-slate-900">Target Tercapai</h2>
-      <p className="mt-1 text-[12px] text-slate-400">
-        <span className="font-bold text-[#2E7D32]">{reached} dari {days.length} hari</span> dalam rentang ini
-      </p>
-      <div className="mt-4 grid grid-cols-7 gap-1.5">
-        {days.map((d, i) => {
-          const ok = d.kalori > 0 && target && d.kalori <= target;
-          return (
-            <div key={i} className="flex flex-col items-center gap-1">
-              <span
-                className={`flex h-8 w-8 items-center justify-center rounded-full text-[13px] font-bold ${
-                  ok ? "bg-emerald-100 text-[#2E7D32]" : "text-slate-300"
-                }`}
-              >
-                {ok ? "✓" : "•"}
-              </span>
-              <span className="text-[9px] font-semibold text-slate-400">{d.label}</span>
-            </div>
-          );
-        })}
       </div>
     </div>
   );
