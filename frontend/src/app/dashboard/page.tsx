@@ -138,13 +138,13 @@ export default function DashboardPage() {
     const list: { title: string; suggestions: string[] }[] = [];
     if (proteinGap > 0) {
       list.push({
-        title: `Protein masih kurang ${proteinGap} g. Fokus protein di menu berikutnya!`,
+        title: `Protein masih kurang ${proteinGap} g`,
         suggestions: ["2 butir telur", "100g dada ayam panggang", "150g tempe"],
       });
     }
     if (target && remaining != null && remaining > 0) {
       list.push({
-        title: `Kalori hari ini masih kurang ${remaining.toLocaleString("id-ID")} kkal.`,
+        title: `Kalori hari ini masih kurang ${remaining.toLocaleString("id-ID")} kkal`,
         suggestions: ["1 porsi nasi merah", "1 buah pisang", "Segenggam kacang almond"],
       });
     }
@@ -217,7 +217,7 @@ export default function DashboardPage() {
             onClick={() => setMacroOpen((o) => !o)}
             className="flex w-full items-center justify-between text-left"
           >
-            <h2 className="text-[14px] font-bold text-slate-900">Makronutrien</h2>
+            <h2 className="text-[14px] font-bold text-slate-900">Nutrisi Utama</h2>
             <span className="flex items-center gap-1 text-[12px] font-bold text-[#2E7D32]">
               Lihat Detail
               <svg
@@ -247,7 +247,7 @@ export default function DashboardPage() {
           </div>
           {macroOpen && (
             <div className="mt-3 border-t border-dashed border-slate-200 pt-3 anim-notif-in" key="micro">
-              <p className="text-[11px] font-bold text-slate-500">Mikronutrisi</p>
+              <p className="text-[11px] font-bold text-slate-500">Nutrisi Mikro</p>
               <div className="mt-2.5 grid grid-cols-3 gap-2">
                 {[
                   { label: "Serat", value: micros.serat, unit: "g" },
@@ -365,23 +365,17 @@ function Header({
             </button>
           </div>
 
-          <div className="max-h-[22rem] space-y-1.5 overflow-y-auto px-2.5 py-2">
+          <div className="max-h-[22rem] space-y-1 overflow-y-auto px-2 py-2">
             {alerts.map((a) => (
-              <div
-                key={a.title}
-                className="rounded-xl border border-slate-100 bg-slate-50/60 p-2.5"
-              >
+              <div key={a.title} className="rounded-xl border border-slate-100 bg-slate-50/60 p-2">
                 <p className="text-xs font-bold leading-snug text-slate-900">
                   <span className="mr-1">💡</span>
                   {a.title}
                 </p>
-                <p className="mt-1 text-[9px] font-bold uppercase tracking-wide text-slate-400">
-                  Bisa coba:
-                </p>
-                <ul className="mt-0.5 space-y-1">
+                <ul className="mt-1 space-y-1">
                   {a.suggestions.map((s) => (
-                    <li key={s} className="flex items-start gap-1.5 text-xs leading-snug text-slate-600">
-                      <span className="mt-[3px] flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-[8px] font-bold text-emerald-700">
+                    <li key={s} className="flex items-center gap-1.5 text-xs leading-snug text-slate-600">
+                      <span className="flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded bg-emerald-100 text-[9px] font-bold text-emerald-700">
                         ✓
                       </span>
                       {s}
@@ -398,44 +392,25 @@ function Header({
   );
 }
 
-function macroGlyph(kind: "carbs" | "protein" | "fat") {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-      {kind === "carbs" ? (
-        <>
-          <path d="M2 22 16 8" />
-          <path d="M17.5 8 16 9.5 14.5 8" />
-          <path d="M20.5 5 19 6.5 17.5 5" />
-          <path d="M20.5 11l-1.5 1.5-1.5-1.5" />
-          <path d="M12 6l-1.5 1.5L9 6" />
-          <path d="M12 12l-1.5 1.5L9 12" />
-        </>
-      ) : kind === "protein" ? (
-        <>
-          <path d="M6.5 3h11C18.5 5 19 7.5 19 10.5c0 4.5-3.1 8.5-7 8.5s-7-4-7-8.5C5 7.5 5.5 5 6.5 3Z" />
-          <path d="M9 8.5c.5 1.2 1.5 2 2.5 2.2" />
-        </>
-      ) : (
-        <path d="M12 2.7S6 9 6 14a6 6 0 0 0 12 0c0-5-6-11.3-6-11.3Z" />
-      )}
-    </svg>
-  );
-}
-
 function MacroCard({ kind, label, grams, target, color }: { kind: "carbs" | "protein" | "fat"; label: string; grams: number; target: number; color: string }) {
   const pct = Math.min(100, (grams / target) * 100);
+  const emoji: Record<"carbs" | "protein" | "fat", string> = {
+    carbs: "🌾",
+    protein: "🥚",
+    fat: "🥑",
+  };
   return (
     <div className="flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-white p-3.5 shadow-sm">
       <span
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-white"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl"
         style={{ background: color }}
       >
-        {macroGlyph(kind)}
+        {emoji[kind]}
       </span>
       <div className="min-w-0 flex-1">
         <p className="text-[13px] font-bold text-slate-800">{label}</p>
         <p className="mt-0.5 text-[12px] font-semibold text-slate-400">
-          {grams.toLocaleString("id-ID")} g
+          {grams.toLocaleString("id-ID")} g <span className="text-slate-300">/ {target.toLocaleString("id-ID")} g</span>
         </p>
       </div>
       <div className="flex w-[42%] shrink-0 items-center gap-2">
@@ -459,22 +434,22 @@ function MealRow({ entry }: { entry: FoodEntry }) {
     minute: "2-digit",
   });
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-white p-3 shadow-sm">
-      <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-emerald-50">
+    <div className="flex items-center gap-2.5 rounded-2xl border border-slate-200/70 bg-white p-2.5 shadow-sm">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-emerald-50">
         {entry.image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={entry.image} alt={entry.name} className="h-full w-full object-cover" />
         ) : (
-          <span className="text-xl">🍽️</span>
+          <span className="text-lg">🍽️</span>
         )}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[14px] font-bold text-slate-900">{entry.name}</p>
+        <p className="truncate text-[13px] font-bold text-slate-900">{entry.name}</p>
         <p className="text-[11px] text-slate-400">{entry.mealType || "Makanan"} · {time}</p>
       </div>
-      <div className="shrink-0 rounded-xl bg-orange-50 px-2.5 py-1 text-center">
-        <p className="text-[13px] font-extrabold text-orange-600">{entry.calories}</p>
-        <p className="text-[9px] font-bold uppercase text-orange-400">kkal</p>
+      <div className="shrink-0 rounded-lg bg-orange-50 px-2 py-0.5 text-center">
+        <p className="text-[12px] font-extrabold text-orange-600">{entry.calories}</p>
+        <p className="text-[8px] font-bold uppercase text-orange-400">kkal</p>
       </div>
     </div>
   );
@@ -540,7 +515,7 @@ function CoachFloating({ profileId }: { profileId: string | null }) {
   return (
     <>
       {!isOpen && (
-        <div className="fixed bottom-[4.5rem] right-4 z-40 flex flex-col items-end">
+        <div className="fixed bottom-16 right-4 z-40 flex flex-col items-end">
           <button
             onClick={() => setIsOpen(true)}
             className="relative flex items-center gap-1.5 rounded-full bg-gradient-to-br from-emerald-400 to-[#2E7D32] px-3 py-2 text-xs font-bold text-white shadow-xl shadow-emerald-500/30 transition hover:-translate-y-0.5 hover:shadow-2xl"
@@ -548,7 +523,7 @@ function CoachFloating({ profileId }: { profileId: string | null }) {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" />
             </svg>
-            <span className="hidden sm:inline">Tanya Coach</span>
+            <span>Tanya Coach AI</span>
           </button>
         </div>
       )}

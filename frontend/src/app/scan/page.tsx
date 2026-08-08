@@ -732,34 +732,20 @@ function NutriRow({
     fat: { color: "#3B82F6", bg: "#E8F0FE" },
   };
   const s = styles[kind];
-  const glyph =
-    kind === "kal" ? (
-      <path d="M12 2c1 4 5 6 5 11a5 5 0 0 1-10 0c0-5 4-7 5-11Z" />
-    ) : kind === "carbs" ? (
-      <>
-        <path d="M2 22 16 8" />
-        <path d="M17.5 8 16 9.5 14.5 8" />
-        <path d="M20.5 5 19 6.5 17.5 5" />
-        <path d="M20.5 11l-1.5 1.5-1.5-1.5" />
-        <path d="M12 6l-1.5 1.5L9 6" />
-        <path d="M12 12l-1.5 1.5L9 12" />
-      </>
-    ) : kind === "protein" ? (
-      <>
-        <path d="M6.5 3h11C18.5 5 20 7.5 20 10.5c0 4.5-3.1 8.5-7 8.5s-7-4-7-8.5C6 7.5 6.5 5 6.5 3Z" />
-        <path d="M9 8.5c.5 1.2 1.5 2 2.5 2.2" />
-      </>
-    ) : (
-      <path d="M12 2.7S6 9 6 14a6 6 0 0 0 12 0c0-5-6-11.3-6-11.3Z" />
-    );
+  const emoji: Record<NutriKind, string> = {
+    kal: "🔥",
+    carbs: "🌾",
+    protein: "🥚",
+    fat: "🥑",
+  };
   return (
     <div className="flex items-center justify-between gap-3 rounded-xl border border-slate-200/70 bg-white p-2.5">
       <div className="flex min-w-0 items-center gap-2.5">
         <span
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white"
-          style={{ background: s.color }}
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-base"
+          style={{ background: s.bg }}
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">{glyph}</svg>
+          {emoji[kind]}
         </span>
         <span className="text-[13px] font-bold text-slate-700">{label}</span>
       </div>
